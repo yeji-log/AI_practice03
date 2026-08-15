@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="경험을 이용한 탐색: 휴리스틱 함수와 최상우선탐색 개념 설명 및 격자 미로 시뮬레이터">
-<title>🎯휴리스틱 탐색 시뮬레이터 (최상우선탐색)</title>
+<title>🎯경험적 탐색</title>
 <style>
   :root{
     --paper:#F3F5F4;
@@ -100,7 +100,7 @@
   a{ color:var(--frontier); }
 
   .wrap{
-    max-width:1180px;
+    max-width:1320px;
     margin:0 auto;
     padding: clamp(20px,4vw,48px) clamp(16px,4vw,40px) 80px;
   }
@@ -140,7 +140,7 @@
 
   .layout{
     display:grid;
-    grid-template-columns: minmax(0,1fr) minmax(340px,440px);
+    grid-template-columns: minmax(0,1fr) minmax(340px,620px);
     gap: clamp(24px,4vw,56px);
     align-items:start;
   }
@@ -266,14 +266,6 @@
     font-weight:600;
   }
 
-  .pros-cons{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:1.2em 0; }
-  @media (max-width:520px){ .pros-cons{ grid-template-columns:1fr; } }
-  .pros-cons div{ border-left:3px solid var(--rule); padding-left:12px; }
-  .pros-cons div.pro{ border-color:var(--path); }
-  .pros-cons div.con{ border-color:var(--goal); }
-  .pros-cons strong{ display:block; font-family:var(--font-display); font-size:0.85rem; margin-bottom:4px; }
-  .pros-cons p{ margin:0; font-size:0.9rem; color:var(--ink-soft); }
-
   .note{
     font-size:0.9rem;
     color:var(--ink-soft);
@@ -281,6 +273,35 @@
     padding-top:14px;
     margin-top:2em;
   }
+  .fineprint{ font-size:0.82rem; color:var(--ink-faint); margin:-0.6em 0 1.2em; }
+
+  .table-scroll{ overflow-x:auto; margin:1.2em 0; }
+  table.cmp{
+    width:100%;
+    min-width:480px;
+    border-collapse:collapse;
+    font-size:0.86rem;
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  table.cmp th, table.cmp td{ border-bottom:1px solid var(--rule); padding:9px 12px; text-align:left; vertical-align:top; }
+  table.cmp tr:last-child td{ border-bottom:none; }
+  table.cmp th{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:0.74rem;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:var(--surface-2);
+  }
+  table.cmp td.f{ font-family:var(--font-mono); color:var(--accent-ink); background:var(--accent-soft); font-weight:600; }
+  table.cmp .sub{ font-size:0.78rem; color:var(--ink-faint); }
+  table.cmp .ok{ color:var(--path); font-weight:700; }
+  table.cmp .no{ color:var(--goal); font-weight:700; }
 
   /* ---------- simulator ---------- */
   .sim-section{ position:sticky; top:20px; }
@@ -340,7 +361,15 @@
   .btn.primary:hover{ opacity:0.88; }
   .btn:disabled{ opacity:0.45; cursor:not-allowed; }
 
-  .mode-group{ display:flex; gap:6px; }
+  .mode-group{ display:flex; gap:6px; flex-wrap:wrap; }
+  .toolbar-label{
+    font-family:var(--font-display);
+    font-size:0.75rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    align-self:center;
+    margin-right:2px;
+  }
 
   .grid-wrap{
     padding:16px 18px;
@@ -446,6 +475,13 @@
     font-size:0.72rem;
   }
 
+  .pseudo-panel{
+    padding:14px 18px 18px;
+    border-top:1px solid var(--rule);
+  }
+  .pseudo-panel .pseudo{ margin:0; font-size:0.78rem; }
+  .pseudo-panel .fineprint{ margin:10px 0 0; }
+
   .legend{
     display:flex;
     flex-wrap:wrap;
@@ -479,16 +515,16 @@
   <header class="top">
     <div>
       <div class="eyebrow">경험을 이용한 탐색 · Informed Search</div>
-      <h1>휴리스틱 탐색과 최상우선탐색</h1>
+      <h1>휴리스틱 탐색과 최상우선탐색, 그리고 A*</h1>
     </div>
-    <div class="top-sub">f(n) = h(n) · Greedy Best-First Search</div>
+    <div class="top-sub" id="topSub">f(n) = h(n) · Greedy Best-First Search</div>
   </header>
 
   <div class="layout">
 
     <article class="prose">
 
-      <p class="lead">맹목적으로 사방을 다 뒤지는 대신, 목표에 대한 "감"을 이용해서 더 그럴듯한 방향부터 먼저 확인해본다면 훨씬 빠르게 답을 찾을 수 있지 않을까요.</p>
+      <p class="lead">맹목적으로 사방을 다 뒤지는 대신, 목표에 대한 "감"을 이용해서 더 그럴듯한 방향부터 먼저 확인해본다면 훨씬 빠르게 답을 찾을 수 있지 않을까요?</p>
 
       <h2><span class="num">01</span>경험을 이용한 탐색</h2>
       <p>너비우선탐색이나 깊이우선탐색처럼 문제에 대한 사전 지식 없이 정해진 순서대로만 노드를 확장하는 방식을 <b>맹목적 탐색</b>(blind search)이라 부릅니다. 반면 <b>경험을 이용한 탐색</b>(informed search)은 문제 영역에 대해 미리 알고 있는 지식 — 즉 <span class="term">경험적 지식</span> — 을 활용해서, 목표에 더 가까워 보이는 노드를 먼저 살펴봅니다.</p>
@@ -499,7 +535,7 @@
         </div>
         <div class="card informed">
           <span class="tag">경험을 이용한 탐색</span>
-          <p>"어느 쪽이 목표에 더 가까운가"를 어림잡아 판단에 활용. 휴리스틱 탐색, 최상우선탐색, A*.</p>
+          <p>"어느 쪽이 목표에 더 가까운가"를 어림잡아 판단에 활용. 탐욕적 최상우선탐색, A*.</p>
         </div>
       </div>
 
@@ -507,28 +543,48 @@
       <p>이 어림짐작을 수치로 표현한 것이 <b>휴리스틱 함수</b> <span class="term">h(n)</span>입니다. 노드 n에서 목표까지 실제로 드는 비용은 아직 모르지만, 경험을 바탕으로 "대략 이 정도일 것"이라 추정한 값입니다.</p>
       <div class="callout formula">
         <span class="f">h(n) = |Δrow| + |Δcol|</span>
-        <span class="desc">이 시뮬레이터는 격자 위에서 목표까지의 <b>맨해튼 거리</b>를 휴리스틱으로 사용합니다 — 벽은 무시하고 직선 칸 수만 세는 값입니다.</span>
+        <span class="desc">이 미로 시뮬레이터는 격자 위에서 목표까지의 <b>맨해튼 거리</b>를 휴리스틱으로 사용합니다 — 벽은 없다고 가정하고 상하좌우로만 움직였을 때 필요한 최소 칸 수, 즉 가로·세로 칸 차이를 그냥 더한 값입니다.</span>
       </div>
       <p>휴리스틱은 정답을 보장하지 않는 <b>안내자</b>일 뿐입니다. 벽 같은 실제 장애물을 모르기 때문에, 종종 틀린 방향을 그럴듯하다고 가리키기도 합니다 — 오른쪽 시뮬레이터에서 이 점을 직접 확인할 수 있습니다.</p>
 
-      <h2><span class="num">03</span>최상우선탐색</h2>
-      <p><b>최상우선탐색</b>(Best-First Search)이란, 열린 목록(open list)에 대기 중인 노드들 가운데 평가함수 f(n) 값이 가장 좋은(최상의) 노드를 매번 골라 확장해 나가는 탐색 전략을 통틀어 일컫는 말입니다. 이 시뮬레이터가 구현한 것은 그중 가장 단순한 형태인 <b>탐욕적 최상우선탐색</b>(Greedy Best-First Search) — 오직 <span class="term">f(n) = h(n)</span>만 보고, 지금 이 순간 목표에 가장 가까워 보이는 노드로 그리디하게 이동합니다.</p>
+      <h2><span class="num">03</span>최상우선탐색, 그리고 A*</h2>
+      <p><b>최상우선탐색</b>(Best-First Search)은 open list에서 <span class="term">f(n)</span>이 가장 작은 노드부터 확장하는 전략의 틀입니다. f(n)을 무엇으로 정의하느냐에 따라 아래 세 알고리즘으로 나뉩니다.</p>
 
-      <pre class="pseudo" id="pseudo">
-<span class="pc-line" data-ln="1"><span class="ln">1</span>open ← [ 시작 노드 ]   (h값 계산)</span><span class="pc-line" data-ln="2"><span class="ln">2</span>while open이 비어있지 않다:</span><span class="pc-line" data-ln="3"><span class="ln">3</span>    n ← open에서 h(n)이 최소인 노드</span><span class="pc-line" data-ln="4"><span class="ln">4</span>    open에서 n 제거, closed에 n 추가</span><span class="pc-line" data-ln="5"><span class="ln">5</span>    if n = 목표 노드 → 경로 반환 후 종료</span><span class="pc-line" data-ln="6"><span class="ln">6</span>    for each 이웃 in n의 이웃:</span><span class="pc-line" data-ln="7"><span class="ln">7</span>        if 이웃이 벽 or closed or open에 있음 → 건너뜀</span><span class="pc-line" data-ln="8"><span class="ln">8</span>        이웃의 h 계산 후 open에 추가</span></pre>
-
-      <div class="pros-cons">
-        <div class="pro">
-          <strong>장점</strong>
-          <p>매번 가장 유망해 보이는 노드만 확장하므로, 목표 방향으로 빠르게 파고들어 방문 노드 수가 적고 속도가 빠릅니다.</p>
-        </div>
-        <div class="con">
-          <strong>단점</strong>
-          <p>지금까지 온 실제 비용 g(n)을 전혀 고려하지 않아 최단 경로를 보장하지 못하고, 벽 같은 지역적 함정에 취약합니다.</p>
-        </div>
+      <div class="callout formula">
+        <span class="f">f(n) = g(n) + h(n)</span>
+        <span class="desc">g(n)은 지금까지 <b>실제로 든 비용</b>, h(n)은 위에서 정의한 <b>휴리스틱 함수</b>(맨해튼 거리)입니다.</span>
       </div>
 
-      <p class="note">한 걸음 더 — 여기에 지금까지 이동한 실제 비용 g(n)을 더해 <span class="term">f(n) = g(n) + h(n)</span>으로 평가하면 <b>A* 탐색</b>이 됩니다. 최상우선탐색의 속도와, 실제 비용을 함께 고려하는 균형 감각을 동시에 얻으려는 대표적인 확장입니다.</p>
+      <div class="table-scroll">
+        <table class="cmp">
+          <thead>
+            <tr><th>알고리즘</th><th>f(n)</th><th>사용하는 정보</th><th>최적 경로</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>블라인드 탐색<br><span class="sub">(균일비용, 격자에서는 BFS와 동일)</span></td>
+              <td class="f">g(n)</td>
+              <td>실제 비용만</td>
+              <td><span class="ok">보장</span></td>
+            </tr>
+            <tr>
+              <td>탐욕적 최상우선탐색(Greedy Best-First Search)<br><span class="sub">(지금까지 온 비용(g)은 신경안 씀)</span></td>
+              <td class="f">h(n)</td>
+              <td>휴리스틱만</td>
+              <td><span class="no">불보장</span></td>
+            </tr>
+            <tr>
+              <td>A* 알고리즘</td>
+              <td class="f">g(n) + h(n)</td>
+              <td>둘 다</td>
+              <td><span class="ok">보장*</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fineprint">* h(n)이 admissible(과대추정 없음)할 때. 맨해튼 거리는 이를 만족합니다.</p>
+
+      <p>즉 블라인드 탐색만 h(n)을 쓰지 않아 맹목적 탐색으로 남고, 나머지 둘은 휴리스틱 탐색입니다. 오른쪽에서 세 알고리즘의 차이를 비교해보세요.</p>
 
     </article>
 
@@ -536,10 +592,20 @@
       <div class="sim-card">
         <div class="sim-head">
           <h2>미로 시뮬레이터</h2>
-          <p>벽을 그려 미로를 만들고, 한 단계씩 혹은 자동으로 탐욕적 최상우선탐색을 실행해보세요.</p>
+          <p>알고리즘을 고르고, 벽을 그려 미로를 만든 뒤 한 단계씩 혹은 자동으로 실행해보세요.</p>
         </div>
 
         <div class="toolbar">
+          <span class="toolbar-label">알고리즘</span>
+          <div class="mode-group" role="group" aria-label="탐색 알고리즘" id="algoGroup">
+            <button class="btn" data-algo="bfs" aria-pressed="false">🐌 블라인드(BFS)</button>
+            <button class="btn" data-algo="greedy" aria-pressed="true">🎯 최상우선(그리디)</button>
+            <button class="btn" data-algo="astar" aria-pressed="false">⭐ A*</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <span class="toolbar-label">편집</span>
           <div class="mode-group" role="group" aria-label="편집 모드">
             <button class="btn" data-mode="wall" aria-pressed="true">🧱 벽 그리기</button>
             <button class="btn" data-mode="start" aria-pressed="false">🟣 시작점</button>
@@ -573,8 +639,14 @@
           <div class="stat"><span class="k">탐색한 노드 수</span><span class="v" id="stClosed">0</span></div>
           <div class="stat"><span class="k">단계</span><span class="v" id="stStep">0</span></div>
           <div class="stat"><span class="k">경로 길이</span><span class="v" id="stPath">–</span></div>
-          <div class="stat wide"><span class="k">열린 목록 (h 오름차순)</span><span class="v"><div class="open-chips" id="stOpen"></div></span></div>
+          <div class="stat wide"><span class="k">열린 목록 (f(n) 오름차순)</span><span class="v"><div class="open-chips" id="stOpen"></div></span></div>
           <div class="stat wide"><span class="k">상태</span><span class="v msg" id="stMsg">준비됨 — 한 단계 또는 자동 실행을 눌러보세요</span></div>
+        </div>
+
+        <div class="pseudo-panel">
+          <pre class="pseudo" id="pseudo">
+<span class="pc-line" data-ln="1"><span class="ln">1</span>open ← [ 시작 노드 ]   (f값 계산)</span><span class="pc-line" data-ln="2"><span class="ln">2</span>while open이 비어있지 않다:</span><span class="pc-line" data-ln="3"><span class="ln">3</span>    n ← open에서 f(n)이 최소인 노드</span><span class="pc-line" data-ln="4"><span class="ln">4</span>    open에서 n 제거, closed에 n 추가</span><span class="pc-line" data-ln="5"><span class="ln">5</span>    if n = 목표 노드 → 경로 반환 후 종료</span><span class="pc-line" data-ln="6"><span class="ln">6</span>    for each 이웃 in n의 이웃:</span><span class="pc-line" data-ln="7"><span class="ln">7</span>        if 이웃이 벽 or closed or open에 있음 → 건너뜀</span><span class="pc-line" data-ln="8"><span class="ln">8</span>        이웃의 g, h 계산 후 open에 추가</span></pre>
+          <p class="fineprint" id="algoFormulaNote">현재 선택된 알고리즘: <b id="algoFormulaText">탐욕적 최상우선탐색 — f(n) = h(n)</b></p>
         </div>
 
         <div class="legend">
@@ -613,13 +685,15 @@
 
   function applyDefaultMaze(){
     for (var r=0;r<ROWS;r++) for (var c=0;c<COLS;c++) typeGrid[r][c] = 'empty';
-    // main teaching wall: vertical wall with a gap only at the bottom
-    for (var r=0;r<=8;r++) typeGrid[r][10] = 'wall';
-    // decorative stubs (do not touch row 5, the main corridor)
-    for (var r=0;r<=2;r++) typeGrid[r][4] = 'wall';
-    for (var r=8;r<=10;r++) typeGrid[r][4] = 'wall';
-    for (var r=0;r<=3;r++) typeGrid[r][15] = 'wall';
-    for (var r=7;r<=10;r++) typeGrid[r][15] = 'wall';
+    // zigzag comb: every tooth keeps the corridor close to the start/goal row,
+    // so h(n) always looks good inside it. Greedy best-first walks the whole
+    // winding path and never considers going around — A*/blind search do,
+    // and find the much shorter route instead.
+    var topTeeth = [4,8,12,16];  // blocks rows 3-5, forces a detour down to row 6-7
+    var botTeeth = [2,6,10,14];  // blocks rows 5-7, forces a detour up to row 3-4
+    var i;
+    for (i=0;i<topTeeth.length;i++){ c = topTeeth[i]; for (r=3;r<=5;r++) typeGrid[r][c] = 'wall'; }
+    for (i=0;i<botTeeth.length;i++){ c = botTeeth[i]; for (r=5;r<=7;r++) typeGrid[r][c] = 'wall'; }
     typeGrid[start.r][start.c] = 'empty';
     typeGrid[goal.r][goal.c] = 'empty';
   }
@@ -645,11 +719,30 @@
   function computeH(r,c){ return Math.abs(r-goal.r) + Math.abs(c-goal.c); }
   function inBounds(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
 
+  // ---- algorithm selection: f(n) definition is the only thing that changes ----
+  var ALGO_INFO = {
+    bfs:    { formula:'f(n) = g(n)',         full:'블라인드 탐색(균일비용) — f(n) = g(n)' },
+    greedy: { formula:'f(n) = h(n)',         full:'탐욕적 최상우선탐색 — f(n) = h(n)' },
+    astar:  { formula:'f(n) = g(n) + h(n)',  full:'A* 탐색 — f(n) = g(n) + h(n)' }
+  };
+  var algoMode = 'greedy';
+  function computeF(node){
+    if (algoMode === 'bfs') return node.g;
+    if (algoMode === 'astar') return node.g + node.h;
+    return node.h;
+  }
+  function updateAlgoLabels(){
+    var info = ALGO_INFO[algoMode];
+    document.getElementById('topSub').textContent = info.formula;
+    document.getElementById('algoFormulaText').textContent = info.full;
+  }
+
   // ---- search state ----
-  var open = [], closedSet, queuedSet, current, status, path, started, stepCount;
+  var open = [], closedSet, queuedSet, current, status, path, started, stepCount, nextSeq;
 
   function resetSearch(){
-    open = [{r:start.r, c:start.c, h:computeH(start.r,start.c), parent:null}];
+    nextSeq = 1;
+    open = [{r:start.r, c:start.c, g:0, h:computeH(start.r,start.c), parent:null, seq:0}];
     closedSet = {};
     queuedSet = {}; queuedSet[key(start.r,start.c)] = true;
     current = null;
@@ -720,19 +813,19 @@
   var stMsg = document.getElementById('stMsg');
 
   function updateStatePanel(){
-    stCurrent.textContent = current ? ('(' + current.r + ',' + current.c + ')  h=' + current.h) : '–';
+    stCurrent.textContent = current ? ('(' + current.r + ',' + current.c + ')  g=' + current.g + ' h=' + current.h + ' f=' + computeF(current)) : '–';
     stClosed.textContent = Object.keys(closedSet).length;
     stStep.textContent = stepCount;
     stPath.textContent = (status === 'found') ? (path.length - 1) + ' 칸' : '–';
 
-    var sorted = open.slice().sort(function(a,b){ return a.h - b.h; }).slice(0,6);
+    var sorted = open.slice().sort(function(a,b){ return computeF(a) - computeF(b) || a.seq - b.seq; }).slice(0,6);
     stOpen.innerHTML = '';
     if (sorted.length === 0){
       stOpen.innerHTML = '<span style="background:none;color:var(--ink-faint);padding:0;">비어있음</span>';
     } else {
       sorted.forEach(function(n){
         var s = document.createElement('span');
-        s.textContent = '(' + n.r + ',' + n.c + ') h=' + n.h;
+        s.textContent = '(' + n.r + ',' + n.c + ') f=' + computeF(n);
         stOpen.appendChild(s);
       });
     }
@@ -740,7 +833,12 @@
     stMsg.classList.remove('running','found','nopath');
     if (status === 'idle') stMsg.textContent = '준비됨 — 한 단계 또는 자동 실행을 눌러보세요';
     else if (status === 'running'){ stMsg.textContent = '탐색 중…'; stMsg.classList.add('running'); }
-    else if (status === 'found'){ stMsg.textContent = '목표 도달! 최단으로 보이지만 실제로 최적은 아닐 수 있습니다.'; stMsg.classList.add('found'); }
+    else if (status === 'found'){
+      stMsg.textContent = (algoMode === 'greedy')
+        ? '목표 도달! 최단으로 보이지만 실제로 최적은 아닐 수 있습니다.'
+        : '목표 도달! 이 알고리즘은 최단 경로를 보장합니다.';
+      stMsg.classList.add('found');
+    }
     else if (status === 'nopath'){ stMsg.textContent = '열린 목록이 비었습니다 — 경로를 찾을 수 없습니다.'; stMsg.classList.add('nopath'); }
   }
 
@@ -760,7 +858,10 @@
     }
 
     var idx = 0;
-    for (var i=1;i<open.length;i++) if (open[i].h < open[idx].h) idx = i;
+    for (var i=1;i<open.length;i++){
+      var fi = computeF(open[i]), fIdx = computeF(open[idx]);
+      if (fi < fIdx || (fi === fIdx && open[i].seq < open[idx].seq)) idx = i;
+    }
     var node = open.splice(idx,1)[0];
     delete queuedSet[key(node.r,node.c)];
     closedSet[key(node.r,node.c)] = node;
@@ -784,7 +885,7 @@
       if (typeGrid[nr][nc] === 'wall') continue;
       var k = key(nr,nc);
       if (closedSet[k] || queuedSet[k]) continue;
-      open.push({ r:nr, c:nc, h:computeH(nr,nc), parent:node });
+      open.push({ r:nr, c:nc, g:node.g+1, h:computeH(nr,nc), parent:node, seq:nextSeq++ });
       queuedSet[k] = true;
     }
 
@@ -826,6 +927,18 @@
   });
   document.getElementById('btnReset').addEventListener('click', function(){
     resetSearch();
+  });
+
+  // ---- algorithm mode buttons ----
+  var algoButtons = document.querySelectorAll('#algoGroup [data-algo]');
+  algoButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if (algoMode === btn.dataset.algo) return;
+      algoMode = btn.dataset.algo;
+      algoButtons.forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      updateAlgoLabels();
+      resetSearch();
+    });
   });
 
   // ---- maze editing ----
@@ -926,6 +1039,7 @@
     return false;
   }
 
+  updateAlgoLabels();
   resetSearch();
 })();
 </script>
