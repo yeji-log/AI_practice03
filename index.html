@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👾 인공지능 기초 오리엔테이션</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #ec4899;
+            --accent: #0284c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            border: 1px solid #c7d2fe;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: #0f172a;
+            font-weight: 900;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+        }
+
+        /* 메인 상위 탭 네비게이션 스타일 */
+        .main-tabs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
+        .main-tab-btn {
+            background: #e2e8f0;
+            color: var(--text-sub);
+            border: 1px solid #cbd5e1;
+            padding: 15px 35px;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .main-tab-btn:hover {
+            color: var(--text-main);
+            border-color: var(--primary);
+        }
+
+        .main-tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        /* 메인 탭 콘텐츠 영역 스타일 */
+        .main-tab-content {
+            display: none;
+        }
+
+        .main-tab-content.active {
+            display: block;
+        }
+
+        section {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-sub);
+        }
+
+        strong {
+            color: #0f172a;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .content-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .content-box h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .link-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .link-btn {
+            background: #e2e8f0;
+            color: var(--accent);
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.2s;
+            border: 1px solid #cbd5e1;
+        }
+
+        .link-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .search-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-list li {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-list h3 {
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* 인공지능 역사 테이블 스타일 */
+        .history-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .history-table th, .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .history-table th {
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .period-badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .boom-winter {
+            font-weight: bold;
+            color: #db2777;
+        }
+
+        /* 교과서 내부 탭 스타일 */
+        .sub-tab-container {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .sub-tab-buttons {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .sub-tab-btn {
+            flex: 1;
+            padding: 18px 20px;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .sub-tab-btn:hover {
+            color: var(--text-main);
+            background: #e2e8f0;
+        }
+
+        .sub-tab-btn.active {
+            color: #ffffff;
+            background: var(--primary);
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .sub-tab-content {
+            display: none;
+            padding: 35px;
+        }
+
+        .sub-tab-content.active {
+            display: block;
+        }
+
+        .sub-tab-content h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .sub-tab-content p {
+            color: var(--text-main);
+            font-size: 1.05rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 헤더 -->
+        <header>
+            <div class="badge">🎒 인공지능 기초 오리엔테이션</div>
+            <h1>💯 인공지능 정복하기!!</h1>
+            <p>한 학기 동안 배울 인공지능의 모든 것을 알아봅시다.</p>
+        </header>
+
+        <!-- 상위 메인 탭 네비게이션 버튼 -->
+        <div class="main-tabs">
+            <button class="main-tab-btn active" onclick="openMainTab(event, 'textbook-content')">📚 한 학기 교과서 내용 및 평가계획</button>
+            <button class="main-tab-btn" onclick="openMainTab(event, 'ai-content')">💡 인공지능 핵심 내용</button>
+        </div>
+
+        <!-- [탭 2] 한 학기 교과서 내용 영역 (기본으로 보임) -->
+        <div id="textbook-content" class="main-tab-content active">
+            <section>
+                <h2>📚 미래엔 교과서 '인공지능 기초' 목차</h2>
+                <p style="margin-bottom: 25px;">한 학기 동안 함께 배울 각 단원별 핵심 학습 내용을 탭을 클릭하여 확인해 보세요.</p>
+                
+                <div class="sub-tab-container">
+                    <!-- 서브 탭 버튼 영역 -->
+                    <div class="sub-tab-buttons">
+                        <button class="sub-tab-btn active" onclick="openSubTab(event, 'unit1')">1단원. 이해</button>
+                        <button class="sub-tab-btn" onclick="openSubTab(event, 'unit2')">2단원. 원리와 활용</button>
+                        <button class="sub-tab-btn" onclick="openSubTab(event, 'unit3')">3단원. 데이터와 기계학습</button>
+                        <button class="sub-tab-btn" onclick="openSubTab(event, 'unit4')">4단원. 사회적 영향</button>
+                    </div>
+
+                    <!-- 서브 탭 내용 영역 -->
+                    <div id="unit1" class="sub-tab-content active">
+                        <h3>1단원. 인공지능의 이해</h3>
+                        <p>인공지능의 개념과 역사를 이해하고, 인간의 지능과 컴퓨터의 정보 처리를 비교합니다.</p>
+                        <p>지능형 에이전트와 문제 해결을 위한 탐색의 원리를 체계적으로 학습합니다.</p>
+                    </div>
+                    <div id="unit2" class="sub-tab-content">
+                        <h3>2단원. 인공지능의 원리와 활용</h3>
+                        <p>지식 표현과 추론, 그리고 다양한 인공지능 기술의 원리를 파악합니다.</p>
+                        <p>컴퓨터 비전, 음성 및 자연어 처리 등 실생활과 산업 현장에서 활용되는 인공지능의 응용 사례를 살펴봅니다.</p>
+                    </div>
+                    <div id="unit3" class="sub-tab-content">
+                        <h3>3단원. 데이터와 기계학습</h3>
+                        <p>인공지능 학습에 필요한 데이터의 수집, 전처리 및 분석 과정을 다룹니다.</p>
+                        <p>머신러닝과 딥러닝의 기본 개념을 배우고, 분류와 예측 모델을 직접 실습하며 원리를 익힙니다.</p>
+                    </div>
+                    <div id="unit4" class="sub-tab-content">
+                        <h3>4단원. 인공지능의 사회적 영향</h3>
+                        <p>인공지능 기술이 가져올 미래 사회의 변화와 다양한 진로 및 직업 세계를 탐색합니다.</p>
+                        <p>알고리즘의 편향, 프라이버시, 윤리적 딜레마 등 AI 시대에 요구되는 책임의식과 올바른 태도를 고민합니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 평가계획 및 수업 자료 섹션 -->
+            <section>
+                <h2>📊 평가계획</h2>
+
+                <div class="content-box" style="margin-bottom: 20px;">
+                    <h3>📝 한 학기 평가계획</h3>
+                    <p>정기고사 및 수행평가 반영 비율입니다.</p>
+                    <ul style="color: var(--text-sub); list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                        <li>• <strong>정기고사 (50%)</strong>: 중간고사(50%)</li>
+                        <li>• <strong>수행평가 (50%)</strong>: 인공지능 윤리 보고서(50점)</li>
+                    </ul>
+                </div>
+                
+                <div class="content-box" style="margin-bottom: 20px;">
+                    <h3>📍 <strong>인공지능 윤리 보고서</strong> 평가 기준</h3>
+                    <p style="margin-bottom: 20px;">50점 만점 수행평가 세부 평가 기준표입니다.</p>
+                    
+                    <p style="margin-bottom: 15px;"><strong>[평가 기준]</strong></p>
+                    <ul style="color: var(--text-sub); margin-left: 20px; margin-bottom: 25px; display: flex; flex-direction: column; gap: 8px;">
+                        <li>윤리적 딜레마 선택에서 중요하게 생각한 것을 작성하였는가?</li>
+                        <li>윤리적 딜레마 선택에서 가장 고려하지 않은 것을 작성하였는가?</li>
+                        <li>인공지능으로 발생할 수 있는 윤리적 딜레마에는 무엇이 있는지 조사하였는가?</li>
+                    </ul>
+
+                    <div class="grid-2">
+                        <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid var(--border-color);">
+                            <h4 style="color: var(--primary); margin-bottom: 10px; font-size: 1.05rem;">[배점] 모럴 머신 실행 - 20점</h4>
+                            <ul style="color: var(--text-sub); font-size: 0.95rem; list-style: none; display: flex; flex-direction: column; gap: 6px;">
+                                <li>• 모럴 머신을 실행하고 실습 내용을 작성함: <strong>20점</strong></li>
+                                <li style="white-space: nowrap;">• 모럴 머신을 실행하였지만 실습 내용을 작성하지 않음: <strong>15점</strong></li>
+                                <li>• 모럴 머신을 실행하지 않음(기본점수): <strong>5점</strong></li>
+                            </ul>
+                        </div>
+                        <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid var(--border-color);">
+                            <h4 style="color: var(--primary); margin-bottom: 10px; font-size: 1.05rem;">[배점] 논리성 - 30점</h4>
+                            <ul style="color: var(--text-sub); font-size: 0.95rem; list-style: none; display: flex; flex-direction: column; gap: 6px;">
+                                <li>• 평가기준을 모두 만족: <strong>30점</strong></li>
+                                <li>• 평가기준 2개 만족: <strong>25점</strong></li>
+                                <li>• 평가기준 1개 만족: <strong>20점</strong></li>
+                                <li>• 논술을 작성하지 않음(기본점수): <strong>5점</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 수업 자료 섹션 -->
+            <section>
+                <h2>🗃️ 수업 자료</h2>
+                <div class="grid-2">
+                    <div class="content-box">
+                        <h3>📂 수업 자료</h3>
+                        <p>Notion에서 수업에 필요한 학습 자료를 확인할 수 있습니다.</p>
+                        <div class="link-group" style="margin-top: 15px;">
+                            <a href="https://sdhai3.notion.site" target="_blank" class="link-btn">🔗 수업 자료 바로가기 (Notion)</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- [탭 1] 인공지능 핵심 내용 영역 -->
+        <div id="ai-content" class="main-tab-content">
+            <section>
+                <h2>⏳ 1. 인공지능의 역사</h2>
+                <p>인공지능은 끊임없는 기대와 실망 속에서 발전해 왔습니다. 현재의 3차 딥러닝 붐이 오기까지의 역사를 살펴봅시다.</p>
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>연대</th>
+                                <th>명칭</th>
+                                <th>설명</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="period-badge">1956~1974년</span></td>
+                                <td class="boom-winter" style="color: rgb(142, 9, 214)">1차 AI 붐</td>
+                                <td>1956년 다트머스 회의에서 인공지능(AI)이라는 용어가 처음 등장</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-badge">1974~1980년</span></td>
+                                <td class="boom-winter" style="color: #94a3b8;">AI의 겨울</td>
+                                <td>기대했던 성과가 나오지 않아 연구 자금이 줄어들고 AI의 한계가 논의되며 연구가 침체됨</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-badge">1980~1987년</span></td>
+                                <td class="boom-winter" style="color: rgb(142, 9, 214)">2차 AI 붐</td>
+                                <td>전문가 지식을 적용한 전문가 시스템이 등장하면서 AI 연구가 다시 활기를 띠기 시작</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-badge">1987~1993년</span></td>
+                                <td class="boom-winter" style="color: #94a3b8;">AI의 겨울</td>
+                                <td>전문가 시스템의 한계가 드러나면서 AI 연구 자금 지원이 또 다시 감소</td>
+                            </tr>
+                            <!-- white-space: nowrap을 추가하여 머신러닝 발전 글자가 아래로 꺾이지 않도록 수정 -->
+                            <tr>
+                                <td><span class="period-badge">1993~2012년</span></td>
+                                <td class="boom-winter" style="color: rgb(142, 9, 214); white-space: nowrap;">머신러닝 발전</td>
+                                <td>대량의 데이터를 이용한 통계적 머신러닝이 주목받기 시작함. 계산 능력 향상과 인터넷 보급으로 AI 연구가 다시 한 번 진전됨</td>
+                            </tr>
+                            <tr>
+                                <td><span class="period-badge">2012~현재</span></td>
+                                <td class="boom-winter" style="color: #0284c7; white-space: nowrap;">3차 AI 붐</td>
+                                <td>딥러닝의 발전으로 기존에 해결하지 못했던 현실 문제를 풀 수 있게 됨. AI 기술이 급속도로 발전하며 다양한 분야에서 실용화됨</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>🤖 2. 인공지능이 뭔데? 인공지능은 왜 필요할까?</h2>
+                <div class="content-box" style="margin-bottom: 20px;">
+                    <h3>인공지능(Artificial Intelligence)이란?</h3>
+                    <p>간단히 말해 <strong>인간의 뇌 동작을 모방한 기술</strong>이다! 자동차가 우리의 이동을 돕듯, 인공지능은 우리의 삶을 더 편하고 윤택하게 만들어주는 <strong>기술 발전의 총집합!!</strong>이다.</p>
+                </div>
+                <div class="grid-2">
+                    <div class="content-box">
+                        <h3>💻 먼저, 컴퓨터는 왜 필요했을까?</h3>
+                        <p>인간의 계산 한계를 극복하기 위해 탄생. 세상을 바꾸었던 수학자들의 이야기를 영화와 자료로 만나보자!</p>
+                        <div class="link-group">
+                            <a href="https://www.youtube.com/watch?v=gY3uR6zfHf8" target="_blank" class="link-btn">🎬 영화 '히든피겨스'</a>
+                            <a href="https://www.youtube.com/watch?v=0REIhXWjo70" target="_blank" class="link-btn">🎬 영화 '이미테이션 게임'</a>
+                            <a href="https://www.dokie.ai/presentation/share/왜-컴퓨터가-필요했을까-0GxPnewMMkA8" target="_blank" class="link-btn">📊 프레젠테이션 자료 1</a>
+                            <a href="https://yeji-log.github.io/AI_practice/computer.html" target="_blank" class="link-btn">💻 컴퓨터 역사 자료</a>
+                        </div>
+                    </div>
+                    <div class="content-box">
+                        <h3>🤖 인공지능은 왜 필요할까?</h3>
+                        <p>결국 <strong>'편하려고!'</strong> 세상의 모든 복잡한 상황을 사람이 일일이 규칙(Rule)으로 코딩할 수는 없기에, 스스로 학습하는 인공지능이 필수적이다.</p>
+                        <div class="link-group">
+                            <a href="https://yeji-log.github.io/AI_practice/rule-vs-ai.html" target="_blank" class="link-btn">🔗 규칙 vs 인공지능</a>
+                            <a href="https://www.dokie.ai/presentation/share/ai-필요성-자율주행-시뮬레이터-JZ4k7jdj81xl" target="_blank" class="link-btn">📊 프레젠테이션 자료 2</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🏫 3. 우리는 인공지능을 왜 배워야 할까?</h2>
+                <p>자동차나 핸드폰의 모든 내부 구조와 기능을 다 알아야만 쓸 수 있는 것은 아니다. <strong>하지만 조금 더 잘 쓰기 위해서, 그리고 이 사회가 그게 필요하다고 하니까!!!</strong></p>
+                <p>마치 수학, 국어, 영어를 안 해도 살아갈 수는 있지만 이 사회의 일원이 되기 위해 배우는 것과 같다. 자동차 엔지니어처럼 특정 분야에서 제 역할을 하려면, 이 시대가 요구하는 인공지능이라는 언어를 반드시 이해해야 한다.</p>
+            </section>
+
+            <section>
+                <h2>🔍 4. 인공지능에 '탐색'이 왜 필요할까?</h2>
+                <ul class="search-list">
+                    <li>
+                        <h3>① 정답이 하나가 아니라 경로로 존재하기 때문</h3>
+                        <p>많은 AI 문제는 "단번에 정답을 계산"하는 것이 아니라 <strong>여러 단계를 거쳐 목표에 도달</strong>하는 구조이다. 틱택토의 승리는 한 수로 결정되지 않는다. 
+                            1수, 2수, 3수… 일련의 선택이 쌓여야 결과가 나온다. 길 찾기도 마찬가지. 서울에서 부산까지 가는 경로는 단계적 이동의 연속이지 한 번의 계산이 아님. 
+                            이처럼 <strong>정답이 과정 속에 있는 문제</strong>는 반드시 탐색이 필요.</p>
+                    </li>
+                    <li>
+                        <h3>② 경우의 수가 너무 많아 전부 외울 수 없기 때문</h3>
+                        <p>규칙 기반으로 모든 상황을 미리 코딩하는 방법을 생각해볼 수 있다. 
+                            자율주행 수업에서 봤던 IF-THEN 방식이다. 틱택토 판의 상태는 약 36만 가지...
+                             이것을 전부 if문으로 작성하는 것은 불가능에 가깝고, 체스라면 아예 불가능!! 탐색은 모든 경우를 미리 외우는 대신, <strong>필요한 순간에 그 자리에서 경우를 펼쳐보는 방식</strong>으로 
+                             이 문제를 해결.</p>
+                    </li>
+                    <li>
+                        <h3>③ 환경이 바뀌어도 같은 방법으로 대응할 수 있기 때문</h3>
+                        <p>탐색 알고리즘은 특정 게임이나 특정 지도에 종속되지 않는다. 
+                            BFS는 틱택토에도, 미로 찾기에도, 지하철 경로 탐색에도 동일하게 적용된다. 
+                            AI가 새로운 문제를 만났을 때 처음부터 다시 배우지 않아도 되는 이유가 여기 있음. 
+                            <strong>문제의 구조만 탐색 형태로 표현할 수 있다면</strong>, 같은 알고리즘이 작동.</p>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <footer>
+            <p>&copy; yeji. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- 탭 전환 스크립트 -->
+    <script>
+        // 메인 상위 탭 전환 함수
+        function openMainTab(evt, tabId) {
+            const contents = document.getElementsByClassName("main-tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+
+            const buttons = document.getElementsByClassName("main-tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // 교과서 내부 서브 탭 전환 함수
+        function openSubTab(evt, unitId) {
+            const contents = document.getElementsByClassName("sub-tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+
+            const buttons = document.getElementsByClassName("sub-tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            document.getElementById(unitId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
