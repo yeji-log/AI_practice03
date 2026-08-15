@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>딥러닝의 구조와 CNN·RNN</title>
+    <style>
+        :root {
+            --bg-color: #fcfdfd;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent-1: #818cf8;
+            --accent-2: #34d399;
+            --accent-3: #38bdf8;
+            --border-card: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #4f46e5, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* 탭 네비게이션 영역 */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 14px 24px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.03);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: var(--text-main);
+            border-color: var(--accent-1);
+        }
+
+        .tab-btn.active.btn-1 {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px var(--accent-1), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-2 {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 2px var(--accent-2), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-3 {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-color: var(--accent-3);
+            box-shadow: 0 0 0 2px var(--accent-3), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        /* 컨텐츠 패널 영역 */
+        .content-panel {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.03);
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-block {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-block h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .section-block p, .section-block li {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .section-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .section-block li {
+            margin-bottom: 6px;
+        }
+
+        /* 시뮬레이터 스테이지 */
+        .sim-stage {
+            background: #ffffff;
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sim-canvas {
+            width: 100%;
+            max-width: 500px;
+            height: 330px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            touch-action: none;
+        }
+
+        .sim-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sim-btn {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sim-btn:hover {
+            background: #334155;
+        }
+
+        .sim-btn:disabled {
+            background: #94a3b8;
+            cursor: default;
+        }
+
+        .sim-btn.secondary {
+            background: #64748b;
+        }
+        .sim-btn.secondary:hover {
+            background: #475569;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .input-group select {
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #475569;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+
+        /* [1] 딥러닝 구조 시뮬레이터 전용 스타일 */
+        .nn-sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 340px;
+            width: 100%;
+            margin: 0 auto 15px;
+        }
+
+        .nn-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+
+        .nn-slider-row label {
+            width: 26px;
+        }
+
+        .nn-slider-row input[type="range"] {
+            flex: 1;
+        }
+
+        .nn-slider-row .val {
+            width: 40px;
+            text-align: right;
+            color: #1e293b;
+        }
+
+        .nn-output-box {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 340px;
+            width: 100%;
+            margin: 15px auto 0;
+        }
+
+        .nn-output-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .nn-output-row .label {
+            width: 62px;
+            font-weight: bold;
+            color: var(--text-sub);
+            text-align: left;
+        }
+
+        .nn-output-track {
+            flex: 1;
+            height: 14px;
+            background: #f1f5f9;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .nn-output-fill {
+            height: 100%;
+            border-radius: 7px;
+            transition: width 0.5s ease;
+        }
+
+        .nn-output-row .pct {
+            width: 44px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* [2] CNN 시뮬레이터 전용 스타일 */
+        .cnn-canvases-row {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0 5px;
+        }
+
+        .cnn-canvas-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cnn-canvas-col .cnn-label {
+            font-weight: 700;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+        }
+
+        .grid-canvas {
+            width: 220px;
+            height: 220px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .feature-canvas {
+            width: 165px;
+            height: 165px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+        }
+
+        .cnn-arrow {
+            font-size: 1.6rem;
+            color: #94a3b8;
+        }
+
+        .kernel-table {
+            border-collapse: collapse;
+        }
+
+        .kernel-table td {
+            width: 32px;
+            height: 32px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+            background: #f8fafc;
+        }
+
+        /* [3] RNN 시뮬레이터 전용 스타일 */
+        .rnn-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .rnn-input-row input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 160px;
+        }
+
+        .rnn-track {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 15px 10px;
+            justify-content: flex-start;
+            width: 100%;
+            min-height: 130px;
+        }
+
+        .rnn-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .rnn-char-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .rnn-char-box.done {
+            background: #e0f2fe;
+            border-color: #38bdf8;
+            color: #0369a1;
+        }
+
+        .rnn-char-box.active {
+            background: #38bdf8;
+            border-color: #0369a1;
+            color: #fff;
+            transform: scale(1.12);
+            box-shadow: 0 0 0 4px rgba(56,189,248,0.25);
+        }
+
+        .rnn-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 56px;
+        }
+
+        .rnn-bar {
+            width: 7px;
+            border-radius: 2px 2px 0 0;
+            background: #cbd5e1;
+            transition: height 0.4s ease, background 0.4s ease;
+        }
+
+        .rnn-arrow {
+            color: #cbd5e1;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            transition: color 0.4s ease;
+        }
+
+        .rnn-arrow.done {
+            color: #38bdf8;
+        }
+
+        .rnn-bar-vals {
+            display: flex;
+            gap: 3px;
+        }
+
+        .rnn-bar-val {
+            width: 7px;
+            font-size: 0.5rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .rnn-weight-box {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto 18px;
+            text-align: center;
+        }
+
+        .rnn-weight-box summary {
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0284c7;
+        }
+
+        .rnn-weight-table {
+            border-collapse: collapse;
+            margin: 10px auto 0;
+        }
+
+        .rnn-weight-table th, .rnn-weight-table td {
+            width: 46px;
+            height: 26px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #334155;
+            background: #f8fafc;
+        }
+
+        .rnn-weight-table th {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .rnn-cell-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin: 5px 0 20px;
+        }
+
+        .rnn-cell-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rnn-cell-box {
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 8px 14px;
+            background: #f8fafc;
+            text-align: center;
+            min-width: 92px;
+            transition: all 0.3s ease;
+        }
+
+        .rnn-cell-box.core {
+            border-color: #0f172a;
+            background: #0f172a;
+        }
+
+        .rnn-cell-box.core.active {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56,189,248,0.25);
+        }
+
+        .rnn-cell-title {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .rnn-cell-box.core .rnn-cell-title {
+            color: #94a3b8;
+        }
+
+        .rnn-cell-char {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .rnn-cell-arrow {
+            font-size: 1.4rem;
+            color: #94a3b8;
+        }
+
+        .rnn-cell-loop-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            margin-top: 2px;
+        }
+
+        .rnn-cell-loop-arrow {
+            display: inline-block;
+            font-size: 1.5rem;
+            color: #94a3b8;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .rnn-cell-loop-arrow.active {
+            color: #38bdf8;
+            transform: scale(1.3);
+        }
+
+        .rnn-cell-loop-label {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .rnn-vec-chips {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            max-width: 120px;
+        }
+
+        .rnn-vec-chip {
+            min-width: 28px;
+            padding: 2px 3px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            border-radius: 4px;
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .rnn-cell-box.core .rnn-vec-chip {
+            background: #1e293b;
+            color: #38bdf8;
+        }
+
+        .rnn-calc-box {
+            width: 100%;
+            max-width: 480px;
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 5px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .rnn-calc-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .rnn-calc-line {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.75rem;
+            color: #7dd3fc;
+            line-height: 1.7;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+
+        .rnn-calc-line .res {
+            color: #4ade80;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧠 딥러닝의 구조와 CNN·RNN</h1>
+        <p class="subtitle">인공신경망의 기본 구조부터 이미지 인식의 핵심 CNN, 순서 데이터 처리의 핵심 RNN을 학습해 봅시다.</p>
+    </header>
+
+    <!-- 탭 네비게이션 영역 -->
+    <div class="tab-container">
+        <button class="tab-btn btn-1 active" id="tab-1" onclick="switchTab(1)">
+            <span>🕸️</span> 1. 딥러닝 구조
+        </button>
+        <button class="tab-btn btn-2" id="tab-2" onclick="switchTab(2)">
+            <span>🖼️</span> 2. CNN (합성곱 신경망)
+        </button>
+        <button class="tab-btn btn-3" id="tab-3" onclick="switchTab(3)">
+            <span>🔁</span> 3. RNN (순환 신경망)
+        </button>
+    </div>
+
+    <!-- [TAB 1] 딥러닝 구조 패널 -->
+    <div class="content-panel active" id="panel-1">
+        <div class="section-block">
+            <h3>💡 딥러닝이란?</h3>
+            <p>딥러닝(Deep Learning)은 사람 뇌의 뉴런 연결 구조를 본뜬 <strong>인공신경망(Artificial Neural Network)</strong>을 여러 층으로 깊게(Deep) 쌓아, 데이터 속의 패턴을 스스로 찾아내는 인공지능 기술입니다.</p>
+        </div>
+
+        <div class="section-block">
+            <h3>💡 인공신경망의 기본 구조</h3>
+            <ul>
+                <li><strong>입력층 (Input Layer):</strong> 이미지, 숫자 등 원본 데이터가 처음 들어오는 층입니다.</li>
+                <li><strong>은닉층 (Hidden Layer):</strong> 입력값에 가중치(Weight)를 곱해 더한 뒤 활성화 함수를 거쳐 특징을 추출하는 층입니다. 이 층이 많아질수록 '깊은(Deep)' 신경망이 됩니다.</li>
+                <li><strong>출력층 (Output Layer):</strong> 계산된 결과를 최종적으로 내보내는 층입니다.</li>
+            </ul>
+            <p style="margin-bottom: 0;">각 층의 값이 순서대로 다음 층에 전달되며 계산되는 과정을 <strong>순전파(Forward Propagation)</strong>라고 합니다.</p>
+        </div>
+
+        <div class="sim-stage">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-sub);">입력값(x1, x2, x3)을 조절하고 <strong>순전파 실행</strong> 버튼을 눌러 신호가 입력층 → 은닉층 → 출력층으로 전달되는 과정을 확인해 보세요.</p>
+
+            <div class="nn-sliders">
+                <div class="nn-slider-row">
+                    <label for="nn-x1">x1</label>
+                    <input type="range" id="nn-x1" min="-1" max="1" step="0.1" value="0.3" oninput="nnHandleSliderChange()">
+                    <span class="val" id="nn-x1-val">0.3</span>
+                </div>
+                <div class="nn-slider-row">
+                    <label for="nn-x2">x2</label>
+                    <input type="range" id="nn-x2" min="-1" max="1" step="0.1" value="-0.4" oninput="nnHandleSliderChange()">
+                    <span class="val" id="nn-x2-val">-0.4</span>
+                </div>
+                <div class="nn-slider-row">
+                    <label for="nn-x3">x3</label>
+                    <input type="range" id="nn-x3" min="-1" max="1" step="0.1" value="0.6" oninput="nnHandleSliderChange()">
+                    <span class="val" id="nn-x3-val">0.6</span>
+                </div>
+            </div>
+
+            <canvas id="nn-canvas" class="sim-canvas" width="500" height="330"></canvas>
+            <div class="status-text" id="nn-status">입력값을 조절한 뒤 순전파를 실행해 보세요.</div>
+
+            <div class="nn-output-box" id="nn-output-box">
+                <div class="nn-output-row">
+                    <span class="label">출력 A</span>
+                    <div class="nn-output-track"><div class="nn-output-fill" id="nn-out-a-fill" style="width: 0%; background: #6366f1;"></div></div>
+                    <span class="pct" id="nn-out-a-pct">0%</span>
+                </div>
+                <div class="nn-output-row">
+                    <span class="label">출력 B</span>
+                    <div class="nn-output-track"><div class="nn-output-fill" id="nn-out-b-fill" style="width: 0%; background: #ec4899;"></div></div>
+                    <span class="pct" id="nn-out-b-pct">0%</span>
+                </div>
+            </div>
+
+            <div class="sim-controls">
+                <button class="sim-btn" id="nn-run-btn" onclick="nnRunForward()">순전파 실행 ▶</button>
+                <button class="sim-btn secondary" onclick="nnReset()">가중치 새로고침</button>
+            </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom: 0;">
+            <h3>✨ 특징</h3>
+            <ul>
+                <li>층이 깊고 노드가 많을수록 복잡한 패턴을 학습할 수 있지만, 그만큼 많은 데이터와 연산량이 필요합니다.</li>
+                <li>선(연결선)의 색은 가중치의 부호(파랑: 양수, 빨강: 음수)를, 굵기는 가중치의 크기를 나타냅니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 2] CNN 패널 -->
+    <div class="content-panel" id="panel-2">
+        <div class="section-block">
+            <h3>💡 CNN(합성곱 신경망)이란?</h3>
+            <p>CNN(Convolutional Neural Network)은 이미지처럼 격자 형태로 이루어진 데이터에서 선, 모서리, 질감 같은 <strong>지역적 특징(local feature)</strong>을 잘 잡아내도록 설계된 신경망입니다.</p>
+        </div>
+
+        <div class="section-block">
+            <h3>💡 CNN의 구조</h3>
+            <ul>
+                <li><strong>합성곱층 (Convolution Layer):</strong> 작은 <strong>필터(커널)</strong>가 이미지 위를 이동(sliding)하며 각 위치의 값과 필터 값을 곱해 더한 <strong>특징 맵(Feature Map)</strong>을 만듭니다.</li>
+                <li><strong>풀링층 (Pooling Layer):</strong> 특징 맵의 크기를 줄이면서 중요한 정보만 남깁니다 (예: Max Pooling).</li>
+                <li><strong>완전연결층 (Fully Connected Layer):</strong> 추출된 특징을 바탕으로 최종 분류·예측을 수행합니다.</li>
+            </ul>
+        </div>
+
+        <div class="sim-stage">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-sub);">왼쪽 캔버스를 클릭하거나 드래그해서 그림을 그리고, 필터를 선택해 <strong>합성곱 실행</strong>을 눌러보세요!</p>
+
+            <div class="cnn-canvases-row">
+                <div class="cnn-canvas-col">
+                    <span class="cnn-label">원본 그림 (8×8)</span>
+                    <canvas id="cnn-input-canvas" class="grid-canvas" width="288" height="288"></canvas>
+                </div>
+                <div class="cnn-canvas-col">
+                    <span class="cnn-arrow">➜</span>
+                    <table class="kernel-table" id="cnn-kernel-table"></table>
+                </div>
+                <div class="cnn-canvas-col">
+                    <span class="cnn-label">특징 맵 (6×6)</span>
+                    <canvas id="cnn-output-canvas" class="feature-canvas" width="180" height="180"></canvas>
+                </div>
+            </div>
+
+            <div class="status-text" id="cnn-status">그림을 그린 뒤 합성곱 실행 버튼을 눌러보세요.</div>
+
+            <div class="sim-controls">
+                <div class="input-group">
+                    <label for="cnn-kernel-select">필터(커널):</label>
+                    <select id="cnn-kernel-select" onchange="cnnUpdateKernelTable()">
+                        <option value="edge">엣지 검출</option>
+                        <option value="blur">블러</option>
+                        <option value="sharpen">샤픈</option>
+                    </select>
+                </div>
+                <button class="sim-btn" onclick="cnnRunConvolution()">합성곱 실행 ▶</button>
+                <button class="sim-btn secondary" onclick="cnnSampleShape()">예시 그림</button>
+                <button class="sim-btn secondary" onclick="cnnClear()">지우기</button>
+            </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom: 0;">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 이미지의 위치가 조금 달라져도 같은 특징을 잘 인식하며, 이미지·영상 처리에 뛰어난 성능을 보입니다.</li>
+                <li><strong>단점:</strong> 순서(시간)가 있는 데이터를 다루는 데는 적합하지 않으며, 학습을 위해 많은 양의 데이터가 필요합니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 3] RNN 패널 -->
+    <div class="content-panel" id="panel-3">
+        <div class="section-block">
+            <h3>💡 RNN(순환 신경망)이란?</h3>
+            <p>RNN(Recurrent Neural Network)은 문장, 음성, 시계열처럼 <strong>순서가 중요한 데이터</strong>를 다루기 위한 신경망입니다. 이전 시점에서 계산한 <strong>은닉 상태(Hidden State)</strong>를 기억해 두었다가, 다음 시점의 계산에 함께 사용합니다.</p>
+        </div>
+
+        <div class="section-block">
+            <h3>💡 RNN의 구조 &amp; 원리</h3>
+            <ul>
+                <li>매 시점(time step)마다 새로운 입력과 <strong>이전 은닉 상태</strong>를 함께 받아 <strong>새로운 은닉 상태</strong>를 계산합니다.</li>
+                <li>이 은닉 상태가 계속 다음 시점으로 전달되기 때문에, 앞에서 나온 정보를 '기억'한 채로 다음 계산을 할 수 있습니다.</li>
+                <li><strong>한계:</strong> 문장이 길어지면 앞쪽 정보의 영향이 점점 희미해지는 <strong>기울기 소실(Gradient Vanishing)</strong> 문제가 있어, 이를 보완한 LSTM·GRU 같은 구조가 등장했습니다.</li>
+            </ul>
+        </div>
+
+        <div class="sim-stage">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-sub);">문장을 입력하고 <strong>한 글자씩 실행</strong> 버튼을 눌러보세요. 셀 구조, 은닉 상태 막대그래프, 실제 계산식까지 한 번에 확인할 수 있습니다.</p>
+
+            <div class="rnn-input-row">
+                <input type="text" id="rnn-text-input" maxlength="8" value="딥러닝">
+                <button class="sim-btn" onclick="rnnApplyText()">문장 적용</button>
+            </div>
+
+            <details class="rnn-weight-box">
+                <summary>🔧 이 시뮬레이터가 사용 중인 가중치 보기</summary>
+                <table class="rnn-weight-table" id="rnn-weight-table"></table>
+            </details>
+
+            <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: var(--text-sub); font-weight: 700;">🔁 RNN 셀 구조 (모든 시점에서 같은 셀 하나가 반복 사용됩니다)</p>
+            <div class="rnn-cell-diagram" id="rnn-cell-diagram">
+                <div class="rnn-cell-row">
+                    <div class="rnn-cell-box">
+                        <span class="rnn-cell-title">입력 xₜ</span>
+                        <span class="rnn-cell-char" id="rnn-cell-char">-</span>
+                        <div class="rnn-vec-chips" id="rnn-cell-xt-chips"></div>
+                    </div>
+                    <span class="rnn-cell-arrow">→</span>
+                    <div class="rnn-cell-box core" id="rnn-cell-core">
+                        <span class="rnn-cell-title">RNN 셀</span>
+                        <span style="color:#fff; font-weight:800; font-size:0.8rem;">tanh(Wₓxₜ+Wₕhₜ₋₁+b)</span>
+                    </div>
+                    <span class="rnn-cell-arrow">→</span>
+                    <div class="rnn-cell-box">
+                        <span class="rnn-cell-title">출력 hₜ</span>
+                        <div class="rnn-vec-chips" id="rnn-cell-hnew-chips"></div>
+                    </div>
+                </div>
+                <div class="rnn-cell-loop-wrap">
+                    <span class="rnn-cell-loop-arrow" id="rnn-cell-loop-arrow">↺</span>
+                    <span class="rnn-cell-loop-label">이전 은닉상태 hₜ₋₁이 다시 셀로 들어옵니다</span>
+                    <div class="rnn-vec-chips" id="rnn-cell-hprev-chips"></div>
+                </div>
+            </div>
+
+            <div class="rnn-track" id="rnn-track"></div>
+
+            <div class="rnn-calc-box" id="rnn-calc-box">
+                <div class="rnn-calc-title">📐 방금 계산된 단계의 차원별 상세 수식</div>
+                <div id="rnn-calc-lines">
+                    <div class="rnn-calc-line">문장을 적용하고 실행 버튼을 누르면 계산 과정이 여기에 표시됩니다.</div>
+                </div>
+            </div>
+
+            <div class="status-text" id="rnn-status">문장을 적용하고 실행 버튼을 눌러보세요.</div>
+
+            <div class="sim-controls">
+                <button class="sim-btn" onclick="rnnStepNext()">한 글자씩 실행 ▶</button>
+                <button class="sim-btn" onclick="rnnAutoRun()">전체 자동 실행 ▶▶</button>
+                <button class="sim-btn secondary" onclick="rnnReset()">초기화</button>
+                <button class="sim-btn secondary" onclick="rnnRegenerateWeights()">가중치 새로고침</button>
+            </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom: 0;">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 순서가 있는 데이터(문장, 음성, 시계열 등)의 흐름과 맥락을 반영할 수 있습니다.</li>
+                <li><strong>단점:</strong> 계산이 순서대로만 진행되어 느리고, 먼 과거의 정보를 기억하기 어렵습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // --- 탭 전환 기능 ---
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`tab-${i}`).classList.remove('active', `btn-${i}`);
+                document.getElementById(`panel-${i}`).classList.remove('active');
+            }
+            document.getElementById(`tab-${tabNum}`).classList.add('active', `btn-${tabNum}`);
+            document.getElementById(`panel-${tabNum}`).classList.add('active');
+        }
+
+        // --- 공통 색상 보간 유틸 ---
+        function lerpColor(c1, c2, t) {
+            const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
+            const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
+            const b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
+            return `rgb(${r},${g},${b})`;
+        }
+
+        // --- [1] 딥러닝 구조 - 신경망 시뮬레이터 ---
+        const nnCanvas = document.getElementById('nn-canvas');
+        const nnCtx = nnCanvas.getContext('2d');
+        const nnStatus = document.getElementById('nn-status');
+
+        const NN_IN = 3, NN_HID = 4, NN_OUT = 2;
+        const NN_COLOR_LOW = [226, 232, 240];
+        const NN_COLOR_HIGH = [79, 70, 229];
+        let nnW1, nnB1, nnW2, nnB2;
+        let nnHiddenVals = null, nnOutputVals = null;
+        let nnAnimating = false;
+
+        function nnRandWeight() { return Math.random() * 2 - 1; }
+
+        function nnInitWeights() {
+            nnW1 = Array.from({ length: NN_IN }, () => Array.from({ length: NN_HID }, nnRandWeight));
+            nnB1 = Array.from({ length: NN_HID }, () => nnRandWeight() * 0.5);
+            nnW2 = Array.from({ length: NN_HID }, () => Array.from({ length: NN_OUT }, nnRandWeight));
+            nnB2 = Array.from({ length: NN_OUT }, () => nnRandWeight() * 0.5);
+        }
+
+        function nnSigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+        function nnLayerYs(n, height, margin) {
+            if (n === 1) return [height / 2];
+            const step = (height - margin * 2) / (n - 1);
+            return Array.from({ length: n }, (_, i) => margin + i * step);
+        }
+
+        function nnGetInputs() {
+            return [
+                parseFloat(document.getElementById('nn-x1').value),
+                parseFloat(document.getElementById('nn-x2').value),
+                parseFloat(document.getElementById('nn-x3').value)
+            ];
+        }
+
+        function nnDrawNetwork(opts = {}) {
+            const { glowIn2Hid = false, glowHid2Out = false } = opts;
+            const w = nnCanvas.width, h = nnCanvas.height;
+            nnCtx.clearRect(0, 0, w, h);
+
+            const xIn = 75, xHid = 260, xOut = 435;
+            const yIn = nnLayerYs(NN_IN, h, 60);
+            const yHid = nnLayerYs(NN_HID, h, 48);
+            const yOut = nnLayerYs(NN_OUT, h, 100);
+            const inputs = nnGetInputs();
+            const r = 18;
+
+            nnCtx.font = 'bold 13px sans-serif';
+            nnCtx.textAlign = 'center';
+            nnCtx.fillStyle = '#64748b';
+            nnCtx.fillText('입력층', xIn, 16);
+            nnCtx.fillText('은닉층', xHid, 16);
+            nnCtx.fillText('출력층', xOut, 16);
+
+            function drawEdges(xa, ya, xb, yb, W, glow) {
+                for (let i = 0; i < ya.length; i++) {
+                    for (let j = 0; j < yb.length; j++) {
+                        const wgt = W[i][j];
+                        const positive = wgt >= 0;
+                        const alpha = Math.min(1, Math.abs(wgt) * 0.7 + 0.15);
+                        nnCtx.beginPath();
+                        nnCtx.moveTo(xa, ya[i]);
+                        nnCtx.lineTo(xb, yb[j]);
+                        nnCtx.strokeStyle = positive ? `rgba(59,130,246,${alpha})` : `rgba(239,68,68,${alpha})`;
+                        nnCtx.lineWidth = glow ? (2 + Math.abs(wgt) * 3) : (1 + Math.abs(wgt) * 2);
+                        if (glow) {
+                            nnCtx.shadowColor = positive ? '#3b82f6' : '#ef4444';
+                            nnCtx.shadowBlur = 10;
+                        } else {
+                            nnCtx.shadowBlur = 0;
+                        }
+                        nnCtx.stroke();
+                    }
+                }
+                nnCtx.shadowBlur = 0;
+            }
+
+            drawEdges(xIn, yIn, xHid, yHid, nnW1, glowIn2Hid);
+            drawEdges(xHid, yHid, xOut, yOut, nnW2, glowHid2Out);
+
+            function drawNode(x, y, val, known, labelInside) {
+                let color = '#e2e8f0';
+                if (known) {
+                    const t = Math.max(0, Math.min(1, val));
+                    color = lerpColor(NN_COLOR_LOW, NN_COLOR_HIGH, t);
+                }
+                nnCtx.beginPath();
+                nnCtx.arc(x, y, r, 0, Math.PI * 2);
+                nnCtx.fillStyle = color;
+                nnCtx.fill();
+                nnCtx.strokeStyle = '#1e293b';
+                nnCtx.lineWidth = 1.5;
+                nnCtx.stroke();
+                nnCtx.fillStyle = known ? '#ffffff' : '#334155';
+                nnCtx.font = 'bold 11px sans-serif';
+                nnCtx.textAlign = 'center';
+                nnCtx.textBaseline = 'middle';
+                nnCtx.fillText(labelInside, x, y);
+            }
+
+            inputs.forEach((v, i) => {
+                drawNode(xIn, yIn[i], (v + 1) / 2, true, v.toFixed(1));
+                nnCtx.fillStyle = '#94a3b8';
+                nnCtx.font = '11px sans-serif';
+                nnCtx.textAlign = 'right';
+                nnCtx.textBaseline = 'middle';
+                nnCtx.fillText(`x${i + 1}`, xIn - r - 8, yIn[i]);
+            });
+
+            yHid.forEach((y, j) => {
+                const known = nnHiddenVals !== null;
+                const val = known ? nnHiddenVals[j] : 0;
+                drawNode(xHid, y, val, known, known ? val.toFixed(2) : '?');
+            });
+
+            yOut.forEach((y, k) => {
+                const known = nnOutputVals !== null;
+                const val = known ? nnOutputVals[k] : 0;
+                drawNode(xOut, y, val, known, known ? val.toFixed(2) : '?');
+                nnCtx.fillStyle = '#94a3b8';
+                nnCtx.font = 'bold 11px sans-serif';
+                nnCtx.textAlign = 'left';
+                nnCtx.textBaseline = 'middle';
+                nnCtx.fillText(k === 0 ? '출력 A' : '출력 B', xOut + r + 8, y);
+            });
+        }
+
+        function nnHandleSliderChange() {
+            document.getElementById('nn-x1-val').innerText = document.getElementById('nn-x1').value;
+            document.getElementById('nn-x2-val').innerText = document.getElementById('nn-x2').value;
+            document.getElementById('nn-x3-val').innerText = document.getElementById('nn-x3').value;
+            nnHiddenVals = null;
+            nnOutputVals = null;
+            document.getElementById('nn-output-box').style.display = 'none';
+            nnStatus.innerText = '입력값이 바뀌었습니다. 순전파 실행 버튼을 눌러보세요.';
+            nnDrawNetwork();
+        }
+
+        function nnUpdateOutputDisplay() {
+            const [a, b] = nnOutputVals;
+            const ea = Math.exp(a), eb = Math.exp(b);
+            const sum = ea + eb;
+            const pa = Math.round((ea / sum) * 100);
+            const pb = 100 - pa;
+            document.getElementById('nn-out-a-fill').style.width = pa + '%';
+            document.getElementById('nn-out-b-fill').style.width = pb + '%';
+            document.getElementById('nn-out-a-pct').innerText = pa + '%';
+            document.getElementById('nn-out-b-pct').innerText = pb + '%';
+            document.getElementById('nn-output-box').style.display = 'flex';
+        }
+
+        function nnRunForward() {
+            if (nnAnimating) return;
+            nnAnimating = true;
+            document.getElementById('nn-run-btn').disabled = true;
+            const inputs = nnGetInputs();
+
+            nnHiddenVals = null;
+            nnOutputVals = null;
+            nnStatus.innerText = '1단계: 입력값이 가중치와 함께 은닉층으로 전달됩니다...';
+            nnDrawNetwork({ glowIn2Hid: true });
+
+            setTimeout(() => {
+                nnHiddenVals = nnW1[0].map((_, j) => {
+                    let sum = nnB1[j];
+                    for (let i = 0; i < NN_IN; i++) sum += inputs[i] * nnW1[i][j];
+                    return nnSigmoid(sum);
+                });
+                nnStatus.innerText = '2단계: 은닉층에서 추출된 특징이 출력층으로 전달됩니다...';
+                nnDrawNetwork({ glowHid2Out: true });
+
+                setTimeout(() => {
+                    nnOutputVals = nnW2[0].map((_, k) => {
+                        let sum = nnB2[k];
+                        for (let j = 0; j < NN_HID; j++) sum += nnHiddenVals[j] * nnW2[j][k];
+                        return nnSigmoid(sum);
+                    });
+                    nnStatus.innerText = '3단계: 최종 출력값이 계산되었습니다! ✅';
+                    nnDrawNetwork();
+                    nnUpdateOutputDisplay();
+                    nnAnimating = false;
+                    document.getElementById('nn-run-btn').disabled = false;
+                }, 700);
+            }, 700);
+        }
+
+        function nnReset() {
+            nnInitWeights();
+            nnHiddenVals = null;
+            nnOutputVals = null;
+            document.getElementById('nn-output-box').style.display = 'none';
+            nnStatus.innerText = '가중치가 새로 생성되었습니다. 순전파 실행 버튼을 눌러보세요.';
+            nnDrawNetwork();
+        }
+
+        // --- [2] CNN 시뮬레이터 ---
+        const cnnInputCanvas = document.getElementById('cnn-input-canvas');
+        const cnnInputCtx = cnnInputCanvas.getContext('2d');
+        const cnnOutputCanvas = document.getElementById('cnn-output-canvas');
+        const cnnOutputCtx = cnnOutputCanvas.getContext('2d');
+        const cnnStatus = document.getElementById('cnn-status');
+        const cnnKernelSelect = document.getElementById('cnn-kernel-select');
+
+        const CNN_N = 8;
+        const CNN_CELL = cnnInputCanvas.width / CNN_N;
+        let cnnGrid = Array.from({ length: CNN_N }, () => Array(CNN_N).fill(0));
+        let cnnDrawing = false;
+
+        const CNN_KERNELS = {
+            edge: [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]],
+            blur: [[1 / 9, 1 / 9, 1 / 9], [1 / 9, 1 / 9, 1 / 9], [1 / 9, 1 / 9, 1 / 9]],
+            sharpen: [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
+        };
+
+        function cnnDrawGrid() {
+            cnnInputCtx.clearRect(0, 0, cnnInputCanvas.width, cnnInputCanvas.height);
+            for (let y = 0; y < CNN_N; y++) {
+                for (let x = 0; x < CNN_N; x++) {
+                    cnnInputCtx.fillStyle = cnnGrid[y][x] ? '#1e293b' : '#ffffff';
+                    cnnInputCtx.fillRect(x * CNN_CELL, y * CNN_CELL, CNN_CELL, CNN_CELL);
+                    cnnInputCtx.strokeStyle = '#e2e8f0';
+                    cnnInputCtx.strokeRect(x * CNN_CELL, y * CNN_CELL, CNN_CELL, CNN_CELL);
+                }
+            }
+        }
+
+        function cnnPaintAt(clientX, clientY) {
+            const rect = cnnInputCanvas.getBoundingClientRect();
+            const scaleX = cnnInputCanvas.width / rect.width;
+            const scaleY = cnnInputCanvas.height / rect.height;
+            const x = Math.floor(((clientX - rect.left) * scaleX) / CNN_CELL);
+            const y = Math.floor(((clientY - rect.top) * scaleY) / CNN_CELL);
+            if (x >= 0 && x < CNN_N && y >= 0 && y < CNN_N) {
+                cnnGrid[y][x] = 1;
+                cnnDrawGrid();
+            }
+        }
+
+        cnnInputCanvas.addEventListener('mousedown', e => { cnnDrawing = true; cnnPaintAt(e.clientX, e.clientY); });
+        cnnInputCanvas.addEventListener('mousemove', e => { if (cnnDrawing) cnnPaintAt(e.clientX, e.clientY); });
+        window.addEventListener('mouseup', () => { cnnDrawing = false; });
+        cnnInputCanvas.addEventListener('touchstart', e => {
+            cnnDrawing = true;
+            const t = e.touches[0];
+            cnnPaintAt(t.clientX, t.clientY);
+            e.preventDefault();
+        }, { passive: false });
+        cnnInputCanvas.addEventListener('touchmove', e => {
+            if (cnnDrawing) { const t = e.touches[0]; cnnPaintAt(t.clientX, t.clientY); }
+            e.preventDefault();
+        }, { passive: false });
+        cnnInputCanvas.addEventListener('touchend', () => { cnnDrawing = false; });
+
+        function cnnUpdateKernelTable() {
+            const kernel = CNN_KERNELS[cnnKernelSelect.value];
+            const table = document.getElementById('cnn-kernel-table');
+            table.innerHTML = '';
+            kernel.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(v => {
+                    const td = document.createElement('td');
+                    td.innerText = Number.isInteger(v) ? v : v.toFixed(2);
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+        }
+
+        function cnnClear() {
+            cnnGrid = Array.from({ length: CNN_N }, () => Array(CNN_N).fill(0));
+            cnnDrawGrid();
+            cnnOutputCtx.clearRect(0, 0, cnnOutputCanvas.width, cnnOutputCanvas.height);
+            cnnStatus.innerText = '캔버스를 지웠습니다. 그림을 그려보세요.';
+        }
+
+        function cnnSampleShape() {
+            cnnGrid = Array.from({ length: CNN_N }, () => Array(CNN_N).fill(0));
+            for (let y = 2; y <= 5; y++) {
+                for (let x = 2; x <= 5; x++) {
+                    cnnGrid[y][x] = 1;
+                }
+            }
+            cnnDrawGrid();
+            cnnStatus.innerText = '예시 그림(사각형)을 그렸습니다. 합성곱 실행을 눌러보세요.';
+        }
+
+        function cnnRunConvolution() {
+            const kernel = CNN_KERNELS[cnnKernelSelect.value];
+            const outN = CNN_N - 2;
+            const raw = [];
+            let min = Infinity, max = -Infinity;
+            for (let oy = 0; oy < outN; oy++) {
+                const row = [];
+                for (let ox = 0; ox < outN; ox++) {
+                    let sum = 0;
+                    for (let ky = 0; ky < 3; ky++) {
+                        for (let kx = 0; kx < 3; kx++) {
+                            sum += cnnGrid[oy + ky][ox + kx] * kernel[ky][kx];
+                        }
+                    }
+                    row.push(sum);
+                    if (sum < min) min = sum;
+                    if (sum > max) max = sum;
+                }
+                raw.push(row);
+            }
+
+            const cellF = cnnOutputCanvas.width / outN;
+            cnnOutputCtx.clearRect(0, 0, cnnOutputCanvas.width, cnnOutputCanvas.height);
+            for (let y = 0; y < outN; y++) {
+                for (let x = 0; x < outN; x++) {
+                    const t = max === min ? 0 : (raw[y][x] - min) / (max - min);
+                    cnnOutputCtx.fillStyle = lerpColor([255, 255, 255], [15, 23, 42], t);
+                    cnnOutputCtx.fillRect(x * cellF, y * cellF, cellF, cellF);
+                    cnnOutputCtx.strokeStyle = '#e2e8f0';
+                    cnnOutputCtx.strokeRect(x * cellF, y * cellF, cellF, cellF);
+                }
+            }
+            const kernelName = cnnKernelSelect.options[cnnKernelSelect.selectedIndex].text;
+            cnnStatus.innerText = `합성곱 연산 완료! '${kernelName}' 필터가 그림 위를 이동하며 특징 맵을 만들었습니다.`;
+        }
+
+        // --- [3] RNN 시뮬레이터 ---
+        const rnnTrack = document.getElementById('rnn-track');
+        const rnnStatus = document.getElementById('rnn-status');
+        const RNN_DIM = 4;
+        let rnnWx = Array.from({ length: RNN_DIM }, () => Math.random() * 1.6 - 0.8);
+        let rnnWh = Array.from({ length: RNN_DIM }, () => Math.random() * 1.2 + 0.2);
+        let rnnBias = Array.from({ length: RNN_DIM }, () => Math.random() * 0.4 - 0.2);
+
+        let rnnText = '딥러닝';
+        let rnnHiddenPrev = Array(RNN_DIM).fill(0);
+        let rnnStepIndex = 0;
+        let rnnAutoTimer = null;
+
+        function rnnCharVec(ch, idx) {
+            const code = ch.charCodeAt(0);
+            return Array.from({ length: RNN_DIM }, (_, i) => Math.sin((code + i * 17 + idx * 7) * 0.05));
+        }
+
+        function rnnBuildWeightTable() {
+            const table = document.getElementById('rnn-weight-table');
+            table.innerHTML = '';
+            const header = document.createElement('tr');
+            header.appendChild(document.createElement('th'));
+            for (let i = 0; i < RNN_DIM; i++) {
+                const th = document.createElement('th');
+                th.innerText = `dim${i + 1}`;
+                header.appendChild(th);
+            }
+            table.appendChild(header);
+
+            [['Wₓ', rnnWx], ['Wₕ', rnnWh], ['b', rnnBias]].forEach(([label, arr]) => {
+                const tr = document.createElement('tr');
+                const th = document.createElement('th');
+                th.innerText = label;
+                tr.appendChild(th);
+                arr.forEach(v => {
+                    const td = document.createElement('td');
+                    td.innerText = v.toFixed(2);
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+        }
+
+        function rnnRegenerateWeights() {
+            rnnWx = Array.from({ length: RNN_DIM }, () => Math.random() * 1.6 - 0.8);
+            rnnWh = Array.from({ length: RNN_DIM }, () => Math.random() * 1.2 + 0.2);
+            rnnBias = Array.from({ length: RNN_DIM }, () => Math.random() * 0.4 - 0.2);
+            rnnBuildWeightTable();
+            rnnReset();
+            rnnStatus.innerText = '가중치가 새로 생성되었습니다. 실행 버튼을 눌러보세요.';
+        }
+
+        function rnnSetChips(containerId, values) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            values.forEach(v => {
+                const chip = document.createElement('span');
+                chip.className = 'rnn-vec-chip';
+                chip.innerText = v.toFixed(2);
+                container.appendChild(chip);
+            });
+        }
+
+        function rnnRenderCellDiagram(ch, inputVec, hPrevSnapshot, newHidden) {
+            document.getElementById('rnn-cell-char').innerText = ch;
+            rnnSetChips('rnn-cell-xt-chips', inputVec);
+            rnnSetChips('rnn-cell-hprev-chips', hPrevSnapshot);
+            rnnSetChips('rnn-cell-hnew-chips', newHidden);
+
+            const core = document.getElementById('rnn-cell-core');
+            const loop = document.getElementById('rnn-cell-loop-arrow');
+            core.classList.add('active');
+            loop.classList.add('active');
+            setTimeout(() => { core.classList.remove('active'); loop.classList.remove('active'); }, 600);
+        }
+
+        function rnnRenderCalcDetail(idx, ch, inputVec, hPrevSnapshot, newHidden) {
+            const linesContainer = document.getElementById('rnn-calc-lines');
+            linesContainer.innerHTML = '';
+            const header = document.createElement('div');
+            header.className = 'rnn-calc-line';
+            header.innerHTML = `<span style="color:#e2e8f0;">t=${idx + 1} (문자 '${ch}') 계산 → h_t = tanh(Wₕ×h_(t-1) + Wₓ×x_t + b)</span>`;
+            linesContainer.appendChild(header);
+            for (let i = 0; i < RNN_DIM; i++) {
+                const line = document.createElement('div');
+                line.className = 'rnn-calc-line';
+                line.innerHTML = `h[${i + 1}] = tanh(${rnnWh[i].toFixed(2)}×${hPrevSnapshot[i].toFixed(2)} + ${rnnWx[i].toFixed(2)}×${inputVec[i].toFixed(2)} + ${rnnBias[i].toFixed(2)}) = <span class="res">${newHidden[i].toFixed(2)}</span>`;
+                linesContainer.appendChild(line);
+            }
+        }
+
+        function rnnBuildTrack() {
+            rnnTrack.innerHTML = '';
+            [...rnnText].forEach((ch, idx) => {
+                if (idx > 0) {
+                    const arrow = document.createElement('span');
+                    arrow.className = 'rnn-arrow';
+                    arrow.id = `rnn-arrow-${idx}`;
+                    arrow.innerText = '→';
+                    rnnTrack.appendChild(arrow);
+                }
+                const step = document.createElement('div');
+                step.className = 'rnn-step';
+                step.id = `rnn-step-${idx}`;
+
+                const box = document.createElement('div');
+                box.className = 'rnn-char-box';
+                box.id = `rnn-box-${idx}`;
+                box.innerText = ch;
+
+                const bars = document.createElement('div');
+                bars.className = 'rnn-bars';
+                bars.id = `rnn-bars-${idx}`;
+                for (let i = 0; i < RNN_DIM; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'rnn-bar';
+                    bar.style.height = '2px';
+                    bars.appendChild(bar);
+                }
+
+                const barVals = document.createElement('div');
+                barVals.className = 'rnn-bar-vals';
+                barVals.id = `rnn-barvals-${idx}`;
+                for (let i = 0; i < RNN_DIM; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'rnn-bar-val';
+                    span.innerText = '·';
+                    barVals.appendChild(span);
+                }
+
+                step.appendChild(box);
+                step.appendChild(bars);
+                step.appendChild(barVals);
+                rnnTrack.appendChild(step);
+            });
+        }
+
+        function rnnApplyText() {
+            const val = document.getElementById('rnn-text-input').value.trim();
+            rnnText = val.length ? val.slice(0, 8) : '딥러닝';
+            rnnReset();
+        }
+
+        function rnnReset() {
+            if (rnnAutoTimer) { clearTimeout(rnnAutoTimer); rnnAutoTimer = null; }
+            rnnHiddenPrev = Array(RNN_DIM).fill(0);
+            rnnStepIndex = 0;
+            rnnBuildTrack();
+
+            document.getElementById('rnn-cell-char').innerText = '-';
+            rnnSetChips('rnn-cell-xt-chips', Array(RNN_DIM).fill(0));
+            rnnSetChips('rnn-cell-hprev-chips', Array(RNN_DIM).fill(0));
+            rnnSetChips('rnn-cell-hnew-chips', Array(RNN_DIM).fill(0));
+            document.getElementById('rnn-calc-lines').innerHTML = '<div class="rnn-calc-line">실행 버튼을 누르면 계산 과정이 여기에 표시됩니다.</div>';
+
+            rnnStatus.innerText = `'${rnnText}' 문장이 준비되었습니다. 실행 버튼을 눌러보세요.`;
+        }
+
+        function rnnStepNext() {
+            if (rnnStepIndex >= rnnText.length) {
+                rnnStatus.innerText = '모든 글자를 처리했습니다. 초기화 후 다시 시도해보세요.';
+                return false;
+            }
+            const idx = rnnStepIndex;
+            const ch = rnnText[idx];
+            const inputVec = rnnCharVec(ch, idx);
+            const hPrevSnapshot = rnnHiddenPrev.slice();
+            const newHidden = hPrevSnapshot.map((hPrev, i) => Math.tanh(rnnWh[i] * hPrev + rnnWx[i] * inputVec[i] + rnnBias[i]));
+
+            const bars = document.getElementById(`rnn-bars-${idx}`).children;
+            const barVals = document.getElementById(`rnn-barvals-${idx}`).children;
+            for (let i = 0; i < RNN_DIM; i++) {
+                const v = newHidden[i];
+                bars[i].style.height = Math.max(2, ((v + 1) / 2) * 56) + 'px';
+                bars[i].style.background = v >= 0 ? '#38bdf8' : '#f97316';
+                barVals[i].innerText = v.toFixed(1);
+            }
+
+            document.querySelectorAll('.rnn-char-box.active').forEach(el => el.classList.remove('active'));
+            const box = document.getElementById(`rnn-box-${idx}`);
+            box.classList.add('active');
+            setTimeout(() => { box.classList.remove('active'); box.classList.add('done'); }, 500);
+            if (idx > 0) document.getElementById(`rnn-arrow-${idx}`).classList.add('done');
+
+            rnnRenderCellDiagram(ch, inputVec, hPrevSnapshot, newHidden);
+            rnnRenderCalcDetail(idx, ch, inputVec, hPrevSnapshot, newHidden);
+
+            rnnHiddenPrev = newHidden;
+            rnnStepIndex++;
+            rnnStatus.innerText = `${idx + 1}번째 글자 '${ch}'를 입력받아, 이전 은닉상태와 함께 새로운 은닉상태를 계산했습니다.`;
+            return true;
+        }
+
+        function rnnAutoRun() {
+            if (rnnAutoTimer) return;
+            function loop() {
+                const ok = rnnStepNext();
+                if (ok && rnnStepIndex < rnnText.length) {
+                    rnnAutoTimer = setTimeout(loop, 800);
+                } else {
+                    rnnAutoTimer = null;
+                }
+            }
+            loop();
+        }
+
+        // --- 페이지 로드 시 초기화 ---
+        window.onload = () => {
+            nnInitWeights();
+            nnDrawNetwork();
+
+            cnnUpdateKernelTable();
+            cnnSampleShape();
+
+            rnnBuildWeightTable();
+            rnnBuildTrack();
+        };
+    </script>
+</body>
+</html>
