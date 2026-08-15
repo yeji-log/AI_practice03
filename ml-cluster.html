@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>머신러닝 군집화 알고리즘</title>
+    <style>
+        :root {
+            --bg-color: #fcfdfd;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent-1: #6366f1;
+            --accent-2: #0ea5e9;
+            --border-card: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #6366f1, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* 탭 네비게이션 영역 */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 14px 24px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.03);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: var(--text-main);
+            border-color: var(--accent-1);
+        }
+
+        .tab-btn.active.btn-1 {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px var(--accent-1), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-2 {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 2px var(--accent-2), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        /* 컨텐츠 패널 영역 */
+        .content-panel {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.03);
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-block {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-block h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .section-block p, .section-block li {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .section-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        /* 시뮬레이터 스테이지 */
+        .sim-stage {
+            background: #ffffff;
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sim-canvas {
+            width: 100%;
+            max-width: 500px;
+            height: 330px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .sim-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sim-btn {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sim-btn:hover {
+            background: #334155;
+        }
+
+        .sim-btn.secondary {
+            background: #64748b;
+        }
+        .sim-btn.secondary:hover {
+            background: #475569;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .input-group select {
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #475569;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎯 머신러닝 군집화 알고리즘</h1>
+        <p class="subtitle">K-평균 군집화와 밀도 기반 군집화(DBSCAN)의 원리를 비교해 보세요.</p>
+    </header>
+
+    <!-- 탭 네비게이션 영역 -->
+    <div class="tab-container">
+        <button class="tab-btn btn-1 active" id="tab-1" onclick="switchTab(1)">
+            <span>📊</span> 1. K-평균 군집화 (K-Means)
+        </button>
+        <button class="tab-btn btn-2" id="tab-2" onclick="switchTab(2)">
+            <span>🌊</span> 2. 밀도 기반 군집화 (DBSCAN)
+        </button>
+    </div>
+
+    <!-- [TAB 1] K-평균 군집화 패널 -->
+    <div class="content-panel active" id="panel-1">
+        <div class="section-block">
+            <h3>💡 K-평균 군집화 핵심 작동 원리</h3>
+            <p>K-평균 알고리즘은 사전에 지정한 그룹 개수(K)만큼 중심점(Centroid)을 배치한 뒤, 각 점들과의 거리를 계산해 그룹을 묶고 중심을 이동시키는 과정을 반복합니다.</p>
+            <ul>
+                <li><strong>할당 단계:</strong> 모든 데이터 점들이 가장 가까운 중심점의 그룹 소속으로 지정됩니다.</li>
+                <li><strong>중심 이동 단계:</strong> 각 그룹에 속한 점들의 평균 위치로 중심점이 새로 이동합니다.</li>
+            </ul>
+        </div>
+
+        <div class="sim-stage">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-sub);">캔버스를 마우스로 클릭해 데이터 점들을 직접 추가해 보세요!</p>
+            
+            <canvas id="kmeans-canvas" class="sim-canvas" width="500" height="330"></canvas>
+            <div class="status-text" id="kmeans-status">데이터를 추가하거나 단계를 실행해 보세요.</div>
+
+            <div class="sim-controls">
+                <div class="input-group">
+                    <label for="k-select">그룹 수 (K):</label>
+                    <select id="k-select" onchange="resetKMeans()">
+                        <option value="2">K = 2</option>
+                        <option value="3" selected>K = 3</option>
+                        <option value="4">K = 4</option>
+                    </select>
+                </div>
+                <button class="sim-btn" onclick="stepKMeans()">단계 실행 ▶</button>
+                <button class="sim-btn secondary" onclick="resetKMeans()">초기화</button>
+            </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom: 0;">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 구조가 단순하고 대용량 데이터에서 빠르게 동작합니다.</li>
+                <li><strong>단점:</strong> K값을 미리 지정해야 하며 원형이 아닌 복잡한 형태의 군집은 잘 찾지 못합니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 2] 밀도 기반 군집화 (DBSCAN) 패널 -->
+    <div class="content-panel" id="panel-2">
+        <div class="section-block">
+            <h3>💡 밀도 기반 군집화 (DBSCAN) 핵심 원리</h3>
+            <p>데이터가 <strong>조밀하게 몰려 있는 영역</strong>을 하나의 군집으로 묶는 방식입니다. K-평균과 달리 군집 개수를 미리 지정할 필요가 없으며, 어느 그룹에도 속하지 않는 <strong>이상치(Noise)</strong>를 자연스럽게 걸러낼 수 있습니다.</p>
+            <ul>
+                <li><strong>핵심 아이디어:</strong> 특정 점 주변 반경 안에 설정한 개수 이상의 이웃이 모여 있으면 군집으로 확장합니다.</li>
+                <li><strong>장점:</strong> 초승달 모양처럼 복잡하고 비선형적인 형태의 군집도 잘 찾아냅니다.</li>
+            </ul>
+        </div>
+
+        <div class="sim-stage">
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-sub);">캔버스를 클릭해 점을 찍고 군집화 실행 버튼을 눌러보세요!</p>
+            
+            <canvas id="dbscan-canvas" class="sim-canvas" width="500" height="330"></canvas>
+            <div class="status-text" id="dbscan-status">점들을 추가한 뒤 군집화를 실행해 보세요.</div>
+
+            <div class="sim-controls">
+                <button class="sim-btn" onclick="runDBSCAN()">밀도 기반 군집화 실행 ▶</button>
+                <button class="sim-btn secondary" onclick="resetDBSCAN()">초기화</button>
+            </div>
+        </div>
+
+        <div class="section-block" style="margin-bottom: 0;">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 군집 개수를 지정할 필요가 없고 노이즈(이상치) 구분에 탁월합니다.</li>
+                <li><strong>단점:</strong> 데이터 전반의 밀도가 크게 차이 나면 군집을 정확히 나누기 어려울 수 있습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // --- 탭 전환 기능 ---
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 2; i++) {
+                document.getElementById(`tab-${i}`).classList.remove('active', `btn-${i}`);
+                document.getElementById(`panel-${i}`).classList.remove('active');
+            }
+            const activeBtn = document.getElementById(`tab-${tabNum}`);
+            activeBtn.classList.add('active', `btn-${tabNum}`);
+            document.getElementById(`panel-${tabNum}`).classList.add('active');
+        }
+
+        // --- [K-Means 시뮬레이터 로직] ---
+        const kmCanvas = document.getElementById('kmeans-canvas');
+        const kmCtx = kmCanvas.getContext('2d');
+        const kmStatus = document.getElementById('kmeans-status');
+        const kSelect = document.getElementById('k-select');
+
+        let kmPoints = [];
+        let kmCentroids = [];
+        const kmColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+
+        function resetKMeans() {
+            kmPoints = [];
+            for (let i = 0; i < 35; i++) {
+                kmPoints.push({ x: Math.random() * 160 + 40, y: Math.random() * 120 + 30, cluster: -1 });
+                kmPoints.push({ x: Math.random() * 160 + 280, y: Math.random() * 120 + 170, cluster: -1 });
+            }
+            initKMCentroids();
+            drawKMeans();
+            kmStatus.innerText = "초기 데이터와 중심점이 준비되었습니다. '단계 실행'을 눌러보세요.";
+        }
+
+        function initKMCentroids() {
+            kmCentroids = [];
+            const k = parseInt(kSelect.value);
+            for (let i = 0; i < k; i++) {
+                if (kmPoints.length > 0) {
+                    const rp = kmPoints[Math.floor(Math.random() * kmPoints.length)];
+                    kmCentroids.push({ x: rp.x, y: rp.y });
+                } else {
+                    kmCentroids.push({ x: Math.random() * 400 + 50, y: Math.random() * 250 + 50 });
+                }
+            }
+        }
+
+        kmCanvas.addEventListener('click', (e) => {
+            const rect = kmCanvas.getBoundingClientRect();
+            kmPoints.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, cluster: -1 });
+            drawKMeans();
+        });
+
+        function drawKMeans() {
+            kmCtx.clearRect(0, 0, kmCanvas.width, kmCanvas.height);
+            kmPoints.forEach(p => {
+                kmCtx.beginPath();
+                kmCtx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                kmCtx.fillStyle = p.cluster === -1 ? '#94a3b8' : kmColors[p.cluster % kmColors.length];
+                kmCtx.fill();
+                kmCtx.strokeStyle = '#fff';
+                kmCtx.stroke();
+            });
+            kmCentroids.forEach((c, idx) => {
+                kmCtx.fillStyle = kmColors[idx % kmColors.length];
+                kmCtx.strokeStyle = '#1e293b';
+                kmCtx.lineWidth = 2;
+                kmCtx.fillRect(c.x - 8, c.y - 8, 16, 16);
+                kmCtx.strokeRect(c.x - 8, c.y - 8, 16, 16);
+                kmCtx.fillStyle = '#fff';
+                kmCtx.font = 'bold 10px sans-serif';
+                kmCtx.textAlign = 'center';
+                kmCtx.textBaseline = 'middle';
+                kmCtx.fillText(`C${idx+1}`, c.x, c.y);
+            });
+        }
+
+        function stepKMeans() {
+            if (kmPoints.length === 0) return;
+            let changes = 0;
+            kmPoints.forEach(p => {
+                let minD = Infinity, bestC = 0;
+                kmCentroids.forEach((c, idx) => {
+                    let d = Math.hypot(p.x - c.x, p.y - c.y);
+                    if (d < minD) { minD = d; bestC = idx; }
+                });
+                if (p.cluster !== bestC) { changes++; p.cluster = bestC; }
+            });
+
+            kmCentroids.forEach((c, idx) => {
+                let pts = kmPoints.filter(p => p.cluster === idx);
+                if (pts.length > 0) {
+                    c.x = pts.reduce((acc, p) => acc + p.x, 0) / pts.length;
+                    c.y = pts.reduce((acc, p) => acc + p.y, 0) / pts.length;
+                }
+            });
+            drawKMeans();
+            kmStatus.innerText = changes === 0 ? "✨ 군집화가 완료되었습니다! (더 이상 변화 없음)" : "🔄 중심점과 그룹 소속이 업데이트되었습니다. 단계를 더 눌러보세요.";
+        }
+
+
+        // --- [밀도 기반 군집화 (DBSCAN 스타일) 시뮬레이터 로직] ---
+        const dbCanvas = document.getElementById('dbscan-canvas');
+        const dbCtx = dbCanvas.getContext('2d');
+        const dbStatus = document.getElementById('dbscan-status');
+
+        let dbPoints = [];
+
+        function resetDBSCAN() {
+            dbPoints = [];
+            // 밀집된 형태의 샘플 데이터 생성
+            for (let i = 0; i < 25; i++) {
+                dbPoints.push({ x: Math.random() * 120 + 80, y: Math.random() * 120 + 60, cluster: -1, noise: false });
+                dbPoints.push({ x: Math.random() * 120 + 300, y: Math.random() * 120 + 150, cluster: -1, noise: false });
+            }
+            // 이상치(Noise) 점 몇 개 추가
+            dbPoints.push({ x: 30, y: 30, cluster: -1, noise: false });
+            dbPoints.push({ x: 450, y: 40, cluster: -1, noise: false });
+
+            drawDBSCAN();
+            dbStatus.innerText = "초기 데이터가 준비되었습니다. 군집화 실행을 눌러보세요.";
+        }
+
+        dbCanvas.addEventListener('click', (e) => {
+            const rect = dbCanvas.getBoundingClientRect();
+            dbPoints.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, cluster: -1, noise: false });
+            drawDBSCAN();
+        });
+
+        function drawDBSCAN() {
+            dbCtx.clearRect(0, 0, dbCanvas.width, dbCanvas.height);
+            dbPoints.forEach(p => {
+                dbCtx.beginPath();
+                dbCtx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                if (p.noise) {
+                    dbCtx.fillStyle = '#cbd5e1'; // 회색 (노이즈)
+                } else if (p.cluster === -1) {
+                    dbCtx.fillStyle = '#94a3b8';
+                } else {
+                    dbCtx.fillStyle = kmColors[p.cluster % kmColors.length];
+                }
+                dbCtx.fill();
+                dbCtx.strokeStyle = '#fff';
+                dbCtx.stroke();
+            });
+        }
+
+        // 간단 구현형 밀도 기반 군집화 시뮬레이션 로직
+        function runDBSCAN() {
+            if (dbPoints.length === 0) return;
+            const eps = 45; // 이웃 거리 반경
+            const minPts = 3; // 최소 이웃 수 기준
+            let clusterId = 0;
+
+            dbPoints.forEach(p => { p.cluster = -1; p.noise = false; });
+
+            dbPoints.forEach(p => {
+                if (p.cluster !== -1) return;
+
+                // 반경 내 이웃 찾기
+                let neighbors = dbPoints.filter(n => Math.hypot(n.x - p.x, n.y - p.y) <= eps);
+
+                if (neighbors.length < minPts) {
+                    p.noise = true; // 기준 미달시 노이즈 처리
+                } else {
+                    clusterId++;
+                    p.cluster = clusterId - 1;
+                    let queue = [...neighbors];
+
+                    while (queue.length > 0) {
+                        let q = queue.shift();
+                        if (q.noise) { q.noise = false; q.cluster = clusterId - 1; }
+                        if (q.cluster !== -1) continue;
+                        q.cluster = clusterId - 1;
+
+                        let qNeighbors = dbPoints.filter(n => Math.hypot(n.x - q.x, n.y - q.y) <= eps);
+                        if (qNeighbors.length >= minPts) {
+                            queue.push(...qNeighbors);
+                        }
+                    }
+                }
+            });
+
+            drawDBSCAN();
+            dbStatus.innerText = `🌊 밀도 기반 군집화 완료! (생성된 군집 수: ${clusterId개})`;
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = () => {
+            resetKMeans();
+            resetDBSCAN();
+        };
+    </script>
+</body>
+</html>
