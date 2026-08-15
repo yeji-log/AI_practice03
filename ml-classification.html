@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>분류 알고리즘의 종류</title>
+    <style>
+        :root {
+            --bg-color: #fcfdfd;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent-1: #818cf8;
+            --accent-2: #34d399;
+            --accent-3: #38bdf8;
+            --border: #f1f5f9;
+            --border-card: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #6366f1, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* 탭 네비게이션 영역 */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 16px 24px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.03);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: var(--text-main);
+            border-color: var(--accent-1);
+        }
+
+        .tab-btn.active.btn-1 {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px var(--accent-1), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-2 {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 2px var(--accent-2), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-3 {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-color: var(--accent-3);
+            box-shadow: 0 0 0 2px var(--accent-3), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        /* 컨텐츠 패널 영역 */
+        .content-panel {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.03);
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1e293b;
+        }
+
+        .section-block {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-block h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .section-block p, .section-block li {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .section-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .concept-formula-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-top: 12px;
+        }
+
+        .formula-text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .formula-img-container {
+            flex: 1;
+            text-align: center;
+            min-width: 240px;
+        }
+
+        .sigmoid-svg {
+            width: 100%;
+            max-width: 260px;
+            height: 120px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sim-stage {
+            background: #ffffff;
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgb(0 0 0 / 0.02);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sim-btn {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sim-btn:hover {
+            background: #334155;
+        }
+
+        /* 결정 트리 스타일 */
+        .tree-svg-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 220px;
+            margin: 10px auto;
+        }
+        .tree-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .tree-node-abs {
+            position: absolute;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #64748b;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            transition: all 0.3s;
+        }
+        .tree-packet-abs {
+            width: 14px; height: 14px; background: #f59e0b; border-radius: 50%;
+            position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 8px #f59e0b;
+            z-index: 10; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .edge-label {
+            position: absolute; font-size: 0.7rem; font-weight: bold; color: #64748b; z-index: 2; background: #ffffff; padding: 0 3px;
+        }
+
+        /* 로지스틱 회귀 입력 스타일 */
+        .logistic-track {
+            width: 80%; height: 6px; background: #cbd5e1; border-radius: 3px; position: relative; margin: 30px 0 15px 0; display: flex; align-items: center; justify-content: space-between;
+        }
+        .logistic-ball {
+            width: 20px; height: 20px; background: #34d399; border-radius: 50%; position: absolute; left: 50%; top: -7px; box-shadow: 0 0 10px #34d399; transition: left 0.8s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s;
+        }
+        .logistic-result-badge {
+            font-size: 0.95rem; font-weight: bold; padding: 6px 16px; border-radius: 20px; background: #f1f5f9; color: #64748b; transition: all 0.3s;
+        }
+        .input-group {
+            display: flex; gap: 8px; align-items: center; background: #f8fafc; padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.9rem;
+        }
+        .input-group input, .input-group select {
+            padding: 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: bold; background: #fff;
+        }
+
+        /* KNN 스타일 */
+        .knn-wrapper {
+            display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap; width: 100%;
+        }
+        .knn-grid {
+            width: 260px; height: 180px; border: 1px dashed #cbd5e1; border-radius: 12px; position: relative; background: #fafafa;
+        }
+        .knn-item {
+            width: 12px; height: 12px; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); transition: all 0.3s;
+        }
+        .knn-target {
+            width: 16px; height: 16px; background: #111827; border: 2px solid #ffffff; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 8px #111827; z-index: 10;
+        }
+        .knn-circle {
+            position: absolute; border: 2px dashed #6366f1; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), width 0.4s, height 0.4s; pointer-events: none;
+        }
+        .knn-vote-panel {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; min-width: 210px; text-align: left; font-size: 0.85rem;
+        }
+        .vote-bar-row {
+            display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-weight: bold;
+        }
+        .legend-box {
+            display: flex; gap: 12px; justify-content: center; margin-top: 10px; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); width: 100%;
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .legend-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🤖 머신러닝 - 분류 알고리즘의 종류</h1>
+        <p class="subtitle">버튼을 눌러 세 가지 분류 알고리즘의 동작 과정을 확인해 보세요!</p>
+    </header>
+
+    <!-- 탭 네비게이션 영역 -->
+    <div class="tab-container">
+        <button class="tab-btn btn-1 active" id="tab-1" onclick="switchTab(1)">
+            <span>🌳</span> 1. 결정 트리 (Decision Tree)
+        </button>
+        <button class="tab-btn btn-2" id="tab-2" onclick="switchTab(2)">
+            <span>📈</span> 2. 로지스틱 회귀 (Logistic Regression)
+        </button>
+        <button class="tab-btn btn-3" id="tab-3" onclick="switchTab(3)">
+            <span>🎯</span> 3. K-최근접 이웃 (KNN)
+        </button>
+    </div>
+
+    <!-- [TAB 1] 결정 트리 패널 -->
+    <div class="content-panel active" id="panel-1">
+        <div class="panel-header">
+            <span style="font-size: 1.8rem;">🌳</span>
+            <h2>1. 결정 트리 (Decision Tree)</h2>
+        </div>
+        <div class="section-block">
+            <h3>💡 개념 이해하기</h3>
+            <p>결정 트리는 데이터 속성을 기준으로 스무고개처럼 질문을 던져 참/거짓 가지를 타고 내려가며 최종 그룹을 분류하는 지도학습 알고리즘입니다.</p>
+        </div>
+        
+        <div class="sim-stage">
+            <div class="tree-svg-container">
+                <svg class="tree-svg">
+                    <line x1="240" y1="30" x2="140" y2="100" stroke="#cbd5e1" stroke-width="2" id="edge-1"/>
+                    <line x1="240" y1="30" x2="340" y2="100" stroke="#cbd5e1" stroke-width="2" id="edge-2"/>
+                    <line x1="140" y1="125" x2="80" y2="185" stroke="#cbd5e1" stroke-width="2" id="edge-3"/>
+                    <line x1="140" y1="125" x2="200" y2="185" stroke="#cbd5e1" stroke-width="2" id="edge-4"/>
+                </svg>
+
+                <span class="edge-label" style="top: 60px; left: 175px;">예 (Yes)</span>
+                <span class="edge-label" style="top: 60px; left: 285px;">아니오 (No)</span>
+                <span class="edge-label" style="top: 150px; left: 100px;">맑음</span>
+                <span class="edge-label" style="top: 150px; left: 180px;">흐림</span>
+
+                <div class="tree-packet-abs" id="t-packet" style="top: 30px; left: 240px;"></div>
+
+                <div class="tree-node-abs" id="node-root" style="top: 30px; left: 240px;">기온이 25도 이상?</div>
+                <div class="tree-node-abs" id="node-left" style="top: 115px; left: 140px;">날씨 상태는?</div>
+                <div class="tree-node-abs" id="node-right" style="top: 115px; left: 340px;">실내 카페 ☕</div>
+                <div class="tree-node-abs" id="leaf-1" style="top: 195px; left: 80px;">야외 운동 ⚽</div>
+                <div class="tree-node-abs" id="leaf-2" style="top: 195px; left: 200px;">실내 수영장 🏊</div>
+            </div>
+
+            <div class="sim-controls" style="margin-top: 10px;">
+                <button class="sim-btn" onclick="runConditionTreeAnim()">결정 트리 탐색 시작 ▶</button>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 사람이 사고하는 방식과 매우 유사하여 결과 해석과 시각화가 쉽습니다.</li>
+                <li><strong>단점:</strong> 데이터의 작은 변화에도 트리의 모양이 크게 바뀔 수 있고 무한정 깊어질 수 있으며(과적합 위험), 
+                    이를 극복하기 위해 앙상블 기법(랜덤 포레스트 등)을 함께 사용합니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 2] 로지스틱 회귀 패널 (수식 기호 제거 및 깔끔한 정리) -->
+    <div class="content-panel" id="panel-2">
+        <div class="panel-header">
+            <span style="font-size: 1.8rem;">📈</span>
+            <h2>2. 로지스틱 회귀 (Logistic Regression) </h2>
+        </div>
+        <div class="section-block">
+            <h3>💡 개념 이해하기</h3>
+            <p>선형 회귀는 연속적인 수치를 예측하기 때문에 0 또는 1로 나누는 분류 문제에 직접 쓰기 어렵습니다. 
+                따라서 로지스틱 회귀는<strong>선형 회귀의 결과값 (y = ax + b)을 먼저 구한 뒤, 
+                이를 시그모이드 함수에 통과시켜 0부터 1 사이의 확률값</strong>을 계산합니다.</p>
+            
+            <div class="concept-formula-box">
+                <div class="formula-text">
+                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #1e293b;">📌 시그모이드 변환의 핵심 포인트</p>
+                    <ul style="margin: 0; padding-left: 15px; font-size: 0.9rem;">
+                        <li><strong>시그모이드 함수식:</strong> S(x) = 1/1 + e^-x. [여기서 x = ax + b]</li>
+                        <li><strong>기준선(0.5):</strong> 확률이 정확히 0.5라면 두 그룹 중 어디에도 속하지 않는 경계선입니다.</li>
+                        <li><strong>합격 그룹(1에 수렴):</strong> 점수가 높을수록 1에 가까워지며 확실한 합격으로 판정합니다.</li>
+                        <li><strong>불합격 그룹(0에 수렴):</strong> 점수가 낮을수록 0에 가까워지며 확실한 불합격으로 판정합니다.</li>
+                    </ul>
+                </div>
+                <div class="formula-img-container">
+                    <svg class="sigmoid-svg" viewBox="0 0 220 120">
+                        <line x1="30" y1="100" x2="200" y2="100" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <line x1="115" y1="10" x2="115" y2="110" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <line x1="30" y1="55" x2="200" y2="55" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+                        <text x="10" y="58" font-size="9" fill="#64748b">0.5</text>
+                        <path d="M 40 100 Q 115 100, 115 55 Q 115 10, 190 10" fill="none" stroke="#6366f1" stroke-width="3"/>
+                        <text x="115" y="118" font-size="9" fill="#64748b" text-anchor="middle">기준 경계점 (0점)</text>
+                        <text x="175" y="25" font-size="9" fill="#6366f1">1로 수렴</text>
+                        <text x="45" y="90" font-size="9" fill="#f59e0b">0으로 수렴</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="sim-stage">
+            <div class="logistic-result-badge" id="logistic-badge">확률을 입력하고 실행해 보세요!</div>
+            <div class="logistic-track">
+                <div class="logistic-ball" id="logistic-ball" style="left: 50%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 80%; font-size: 0.8rem; color: var(--text-sub); font-weight: bold;">
+                <span>0.0 (불합격)</span>
+                <span>경계선 0.5</span>
+                <span>1.0 (합격)</span>
+            </div>
+
+            <div class="sim-controls" style="margin-top: 20px;">
+                <div class="input-group">
+                    <label for="prob-input">예측 확률 (0~1):</label>
+                    <input type="number" id="prob-input" min="0" max="1" step="0.05" value="0.85">
+                </div>
+                <button class="sim-btn" onclick="runCustomLogisticAnim()">확률 계산 및 분류 실행 ▶</button>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 결과가 확률 형태로 나와서 신뢰도를 파악하기 쉽고 계산 속도가 빠릅니다.</li>
+                <li><strong>단점:</strong> 복잡하고 비선형적인 데이터 관계를 표현하는 데는 한계가 있습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 3] K-최근접 이웃 패널 -->
+    <div class="content-panel" id="panel-3">
+        <div class="panel-header">
+            <span style="font-size: 1.8rem;">🎯</span>
+            <h2>3. K-최근접 이웃 (KNN; K-Nearest Neighbors) </h2>
+        </div>
+        <div class="section-block">
+            <h3>💡 개념 이해하기</h3>
+            <p>새로운 데이터가 주어졌을 때, 주변에 가장 가까운
+                <strong>K개의 데이터</strong>를 찾아 그중 가장 많은 성향을 가진 그룹으로 분류하는 가장 단순하지만 강력한 비수학적 거리 기반 알고리즘입니다. 
+                ("유전적으로 가까운 이웃의 의견을 따른다"는 개념입니다.)</p>
+        </div>
+
+        <div class="sim-stage" style="min-height: 330px;">
+            <div class="knn-wrapper">
+                <div class="knn-grid" id="knn-grid">
+                    <div class="knn-item" style="background:#10b981; top:42%; left:40%;" data-cls="B" title="초록 1순위"></div>
+                    <div class="knn-item" style="background:#10b981; top:58%; left:42%;" data-cls="B" title="초록 2순위"></div>
+                    <div class="knn-item" style="background:#3b82f6; top:25%; left:30%;" data-cls="A" title="파랑 3순위"></div>
+                    <div class="knn-item" style="background:#3b82f6; top:75%; left:28%;" data-cls="A" title="파랑 4순위"></div>
+                    <div class="knn-item" style="background:#3b82f6; top:50%; left:78%;" data-cls="A" title="파랑 5순위"></div>
+                    <div class="knn-item" style="background:#8b5cf6; top:15%; left:80%;" data-cls="C" title="보라 6순위"></div>
+                    <div class="knn-item" style="background:#8b5cf6; top:85%; left:82%;" data-cls="C" title="보라 7순위"></div>
+
+                    <div class="knn-target" style="top:50%; left:50%;"></div>
+                    <div class="knn-circle" id="knn-circle" style="width: 70px; height: 70px;"></div>
+                </div>
+
+                <div class="knn-vote-panel">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #1e293b;">📊 K 이웃 투표 결과 현황</p>
+                    <div class="vote-bar-row">
+                        <span style="color:#3b82f6;">그룹 A (파랑):</span>
+                        <span id="vote-a">0 표</span>
+                    </div>
+                    <div class="vote-bar-row">
+                        <span style="color:#10b981;">그룹 B (초록):</span>
+                        <span id="vote-b">2 표</span>
+                    </div>
+                    <div class="vote-bar-row">
+                        <span style="color:#8b5cf6;">그룹 C (보라):</span>
+                        <span id="vote-c">0 표</span>
+                    </div>
+                    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 8px 0;">
+                    <div id="vote-winner" style="font-size: 0.8rem; color: #0284c7; font-weight: bold;">최종 결정: 초록 그룹 (K=3 기준)</div>
+                </div>
+            </div>
+
+            <div class="legend-box">
+                <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div>가까운 이웃 (초록)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div>중간 거리 이웃 (파랑)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div>먼 이웃 (보라)</div>
+            </div>
+
+            <div class="sim-controls" style="margin-top: 15px;">
+                <div class="input-group">
+                    <label for="k-input">K값 선택:</label>
+                    <select id="k-input" onchange="runVotingKnnAnim()">
+                        <option value="1">K = 1 (가장 가까운 1개)</option>
+                        <option value="3" selected>K = 3 (가까운 3개)</option>
+                        <option value="5">K = 5 (확장된 5개)</option>
+                        <option value="7">K = 7 (넓은 범위 7개)</option>
+                    </select>
+                </div>
+                <button class="sim-btn" onclick="runVotingKnnAnim()">KNN 다수결 분류 실행 ▶</button>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 직관적이며 별도의 복잡한 학습 과정이 필요 없습니다.</li>
+                <li><strong>단점:</strong> K값 설정에 따라 분류 결과가 민감하게 달라지며, 데이터가 많을수록 계산량이 증가합니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`tab-${i}`).classList.remove('active', 'btn-1', 'btn-2', 'btn-3');
+                document.getElementById(`panel-${i}`).classList.remove('active');
+            }
+            const activeBtn = document.getElementById(`tab-${tabNum}`);
+            activeBtn.classList.add('active', `btn-${tabNum}`);
+            document.getElementById(`panel-${tabNum}`).classList.add('active');
+        }
+
+        function runConditionTreeAnim() {
+            const packet = document.getElementById('t-packet');
+            const rootNode = document.getElementById('node-root');
+            const leftNode = document.getElementById('node-left');
+            const leaf1 = document.getElementById('leaf-1');
+            const edge1 = document.getElementById('edge-1');
+
+            packet.style.transition = 'none';
+            packet.style.top = '30px';
+            packet.style.left = '240px';
+            rootNode.style.borderColor = '#cbd5e1';
+            leftNode.style.borderColor = '#cbd5e1';
+            leaf1.style.background = '#f1f5f9';
+            leaf1.style.color = '#64748b';
+            edge1.style.stroke = '#cbd5e1';
+
+            setTimeout(() => {
+                packet.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                packet.style.top = '115px';
+                packet.style.left = '140px';
+            }, 50);
+
+            setTimeout(() => {
+                rootNode.style.borderColor = '#f59e0b';
+                edge1.style.stroke = '#6366f1';
+            }, 600);
+
+            setTimeout(() => {
+                packet.style.top = '195px';
+                packet.style.left = '80px';
+            }, 900);
+
+            setTimeout(() => {
+                leftNode.style.borderColor = '#34d399';
+            }, 1500);
+
+            setTimeout(() => {
+                leaf1.style.background = '#d1fae5';
+                leaf1.style.color = '#065f46';
+                leaf1.style.borderColor = '#34d399';
+            }, 1900);
+        }
+
+        function runCustomLogisticAnim() {
+            const probInput = document.getElementById('prob-input');
+            let val = parseFloat(probInput.value);
+
+            if (isNaN(val) || val < 0) val = 0;
+            if (val > 1) val = 1;
+            probInput.value = val;
+
+            const ball = document.getElementById('logistic-ball');
+            const badge = document.getElementById('logistic-badge');
+
+            let posPercent = val * 100;
+            ball.style.left = `${posPercent}%`;
+
+            if (val >= 0.5) {
+                ball.style.background = '#6366f1';
+                badge.innerText = `확률 ${val} -> [합격 그룹 (Class 1)] 분류!`;
+                badge.style.background = '#e0e7ff';
+                badge.style.color = '#4338ca';
+            } else {
+                ball.style.background = '#f59e0b';
+                badge.innerText = `확률 ${val} -> [불합격 그룹 (Class 0)] 분류!`;
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#b45309';
+            }
+        }
+
+        function runVotingKnnAnim() {
+            const kInput = document.getElementById('k-input');
+            let kVal = parseInt(kInput.value);
+
+            const circle = document.getElementById('knn-circle');
+            let dynamicSize = 55 + (kVal * 25); 
+            circle.style.width = `${dynamicSize}px`;
+            circle.style.height = `${dynamicSize}px`;
+            circle.style.transform = 'translate(-50%, -50%) scale(0)';
+
+            document.getElementById('vote-a').innerText = `계산 중...`;
+            document.getElementById('vote-b').innerText = `계산 중...`;
+            document.getElementById('vote-c').innerText = `계산 중...`;
+            document.getElementById('vote-winner').innerText = `최종 결정: 탐색 중...`;
+
+            setTimeout(() => {
+                circle.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+
+            setTimeout(() => {
+                let votesA = 0, votesB = 0, votesC = 0;
+                let winner = "";
+                let winColor = "";
+
+                if (kVal === 1) {
+                    votesA = 0; votesB = 1; votesC = 0;
+                    winner = "그룹 B (초록) - 1순위 단독 이웃";
+                    winColor = "#10b981";
+                } else if (kVal === 3) {
+                    votesA = 1; votesB = 2; votesC = 0;
+                    winner = "그룹 B (초록) - 다수결 승리";
+                    winColor = "#10b981";
+                } else if (kVal === 5) {
+                    votesA = 3; votesB = 2; votesC = 0;
+                    winner = "그룹 A (파랑) - 범위 확장으로 역전!";
+                    winColor = "#3b82f6";
+                } else {
+                    votesA = 3; votesB = 2; votesC = 2;
+                    winner = "그룹 A (파랑) - 넓은 범위 다수결 유지";
+                    winColor = "#3b82f6";
+                }
+
+                document.getElementById('vote-a').innerText = `${votesA} 표`;
+                document.getElementById('vote-b').innerText = `${votesB} 표`;
+                document.getElementById('vote-c').innerText = `${votesC} 표`;
+
+                const winnerEl = document.getElementById('vote-winner');
+                winnerEl.innerText = `✨ 최종 결정: [${winner}]`;
+                winnerEl.style.color = winColor;
+            }, 700);
+        }
+    </script>
+</body>
+</html>

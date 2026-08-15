@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회귀(예측) 알고리즘의 종류</title>
+    <style>
+        :root {
+            --bg-color: #fcfdfd;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent-1: #818cf8;
+            --accent-2: #34d399;
+            --accent-3: #38bdf8;
+            --border: #f1f5f9;
+            --border-card: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #6366f1, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* 탭 네비게이션 영역 */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 16px 24px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.03);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: var(--text-main);
+            border-color: var(--accent-1);
+        }
+
+        .tab-btn.active.btn-1 {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px var(--accent-1), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-btn.active.btn-2 {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 2px var(--accent-2), 0 6px 15px -4px rgb(0 0 0 / 0.05);
+        }
+
+        /* 컨텐츠 패널 영역 */
+        .content-panel {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.03);
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1e293b;
+        }
+
+        .section-block {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-block h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .section-block p, .section-block li {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .section-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .concept-formula-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-top: 12px;
+        }
+
+        .formula-text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .formula-img-container {
+            flex: 1;
+            text-align: center;
+            min-width: 240px;
+        }
+
+        .mini-chart-svg {
+            width: 100%;
+            max-width: 260px;
+            height: 120px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sim-stage {
+            background: #ffffff;
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgb(0 0 0 / 0.02);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sim-btn {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sim-btn:hover {
+            opacity: 0.85;
+        }
+
+        .logistic-result-badge {
+            font-size: 0.95rem; font-weight: bold; padding: 6px 16px; border-radius: 20px; background: #f1f5f9; color: #64748b; transition: all 0.3s;
+        }
+
+        .input-group {
+            display: flex; gap: 8px; align-items: center; background: #f8fafc; padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.9rem;
+        }
+        .input-group input, .input-group select {
+            padding: 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: bold; background: #fff;
+        }
+
+        /* 회귀 차트 (선형/다항 공용) */
+        .reg-chart-wrap {
+            width: 100%; max-width: 340px; margin: 0 auto;
+        }
+        .reg-chart {
+            width: 100%; height: auto; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;
+        }
+        #reg-vline, #reg-hline {
+            transition: x1 0.6s cubic-bezier(0.25,1,0.5,1), y1 0.6s cubic-bezier(0.25,1,0.5,1), x2 0.6s cubic-bezier(0.25,1,0.5,1), y2 0.6s cubic-bezier(0.25,1,0.5,1);
+        }
+        #reg-marker {
+            transition: cx 0.4s ease, cy 0.4s ease, r 0.4s ease;
+        }
+        .poly-curve {
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🤖 머신러닝 - 회귀(예측) 알고리즘의 종류</h1>
+        <p class="subtitle">버튼을 눌러 연속적인 수치를 예측하는 두 가지 회귀 알고리즘의 동작 과정을 확인해 보세요!</p>
+    </header>
+
+    <!-- 탭 네비게이션 영역 -->
+    <div class="tab-container">
+        <button class="tab-btn btn-1 active" id="tab-1" onclick="switchTab(1)">
+            <span>📉</span> 1. 선형 회귀 (Linear Regression)
+        </button>
+        <button class="tab-btn btn-2" id="tab-2" onclick="switchTab(2)">
+            <span>🌊</span> 2. 다항 회귀 (Polynomial Regression)
+        </button>
+    </div>
+
+    <!-- [TAB 1] 선형 회귀 패널 -->
+    <div class="content-panel active" id="panel-1">
+        <div class="panel-header">
+            <span style="font-size: 1.8rem;">📉</span>
+            <h2>1. 선형 회귀 (Linear Regression)</h2>
+        </div>
+        <div class="section-block">
+            <h3>💡 개념 이해하기</h3>
+            <p>선형 회귀는 데이터들의 분포를 가장 잘 대표하는 하나의 직선(y = wx + b)을 찾아, 새로운 입력값에 대응하는 <strong>연속적인 수치를 예측</strong>하는 지도학습 알고리즘입니다. 실제 값과 직선이 예측한 값의 오차(잔차)를 제곱해서 더한 값이 최소가 되도록 직선의 기울기와 절편을 학습시킵니다 (최소제곱법).</p>
+        </div>
+
+        <div class="sim-stage">
+            <div class="reg-chart-wrap">
+                <svg class="reg-chart" viewBox="0 0 320 200">
+                    <line x1="40" y1="180" x2="300" y2="180" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="40" y1="180" x2="40" y2="20" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <text x="170" y="196" font-size="9" fill="#64748b" text-anchor="middle">공부 시간 (h)</text>
+                    <text x="14" y="100" font-size="9" fill="#64748b" transform="rotate(-90 14 100)" text-anchor="middle">시험 점수</text>
+
+                    <text x="40" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">0</text>
+                    <text x="170" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">5</text>
+                    <text x="300" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">10</text>
+                    <text x="34" y="183" font-size="8" fill="#94a3b8" text-anchor="end">0</text>
+                    <text x="34" y="103" font-size="8" fill="#94a3b8" text-anchor="end">50</text>
+                    <text x="34" y="24" font-size="8" fill="#94a3b8" text-anchor="end">100</text>
+
+                    <circle cx="66" cy="124" r="4" fill="#94a3b8"/>
+                    <circle cx="92" cy="116" r="4" fill="#94a3b8"/>
+                    <circle cx="118" cy="100" r="4" fill="#94a3b8"/>
+                    <circle cx="144" cy="92" r="4" fill="#94a3b8"/>
+                    <circle cx="170" cy="76" r="4" fill="#94a3b8"/>
+                    <circle cx="196" cy="71" r="4" fill="#94a3b8"/>
+                    <circle cx="222" cy="60" r="4" fill="#94a3b8"/>
+                    <circle cx="248" cy="49" r="4" fill="#94a3b8"/>
+                    <circle cx="274" cy="39" r="4" fill="#94a3b8"/>
+                    <circle cx="300" cy="31" r="4" fill="#94a3b8"/>
+
+                    <line x1="40" y1="134" x2="300" y2="34" stroke="#6366f1" stroke-width="2.5"/>
+
+                    <line id="reg-vline" x1="40" y1="180" x2="40" y2="180" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3"/>
+                    <line id="reg-hline" x1="40" y1="134" x2="40" y2="134" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3"/>
+                    <circle id="reg-marker" cx="40" cy="134" r="0" fill="#f59e0b"/>
+                </svg>
+            </div>
+
+            <div id="linear-badge" class="logistic-result-badge" style="margin-top:10px;">공부 시간을 입력하고 예측을 실행해 보세요!</div>
+
+            <div class="sim-controls">
+                <div class="input-group">
+                    <label for="hour-input">공부 시간(h):</label>
+                    <input type="number" id="hour-input" min="0" max="10" step="1" value="7">
+                </div>
+                <button class="sim-btn" onclick="runLinearRegressionAnim()">예측 실행 ▶</button>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 계산이 간단하고 빠르며, 기울기와 절편이 가지는 의미를 사람이 해석하기 쉽습니다.</li>
+                <li><strong>단점:</strong> 데이터가 곡선 형태 등 비선형적인 관계를 가지면 정확하게 예측하기 어렵고, 이상치(outlier)에 민감하게 영향을 받습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- [TAB 2] 다항 회귀 패널 -->
+    <div class="content-panel" id="panel-2">
+        <div class="panel-header">
+            <span style="font-size: 1.8rem;">🌊</span>
+            <h2>2. 다항 회귀 (Polynomial Regression)</h2>
+        </div>
+        <div class="section-block">
+            <h3>💡 개념 이해하기</h3>
+            <p>데이터가 곡선 형태의 관계를 가질 때는 직선 하나만으로 패턴을 표현하기 어렵습니다. 다항 회귀는
+                <strong>입력값에 2차, 3차 같은 고차항을 추가해 곡선 형태의 회귀선</strong>을 만듭니다.
+                이때 차수(degree)를 얼마나 높이느냐에 따라 모델의 복잡도가 달라지며, 이는 과소적합과 과대적합의 균형과 직결됩니다.</p>
+
+            <div class="concept-formula-box">
+                <div class="formula-text">
+                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #1e293b;">📌 차수(degree)에 따른 모델 변화</p>
+                    <ul style="margin: 0; padding-left: 15px; font-size: 0.9rem;">
+                        <li><strong>차수가 낮으면(1차):</strong> 데이터의 굴곡을 표현하지 못해 과소적합(Underfitting) 발생</li>
+                        <li><strong>차수가 적절하면(2차):</strong> 데이터의 전체적인 경향을 매끄럽게 잘 따라감</li>
+                        <li><strong>차수가 너무 높으면(9차):</strong> 모든 점을 억지로 통과하려다 예측선이 지나치게 구불구불해지는 과대적합(Overfitting) 발생</li>
+                        <li>좋은 모델은 훈련 데이터뿐 아니라 새로운 데이터에서도 오차가 작아야 합니다.</li>
+                    </ul>
+                </div>
+                <div class="formula-img-container">
+                    <svg class="mini-chart-svg" viewBox="0 0 220 120">
+                        <line x1="30" y1="100" x2="205" y2="100" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <line x1="30" y1="10" x2="30" y2="105" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <path d="M35,55 C80,80 140,95 195,98" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+                        <path d="M35,35 C70,90 100,90 130,85 C160,80 180,50 195,25" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="4 3"/>
+                        <line x1="115" y1="15" x2="115" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2"/>
+                        <text x="115" y="112" font-size="8" fill="#64748b" text-anchor="middle">모델 복잡도 (차수)</text>
+                        <text x="8" y="15" font-size="8" fill="#64748b">오차</text>
+                        <text x="197" y="97" font-size="8" fill="#38bdf8" text-anchor="end">훈련 오차</text>
+                        <text x="150" y="20" font-size="8" fill="#f43f5e">테스트 오차</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="sim-stage">
+            <div class="reg-chart-wrap">
+                <svg class="reg-chart" viewBox="0 0 320 200">
+                    <line x1="40" y1="180" x2="300" y2="180" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="40" y1="180" x2="40" y2="20" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <text x="170" y="196" font-size="9" fill="#64748b" text-anchor="middle">운동 시간 (h)</text>
+                    <text x="14" y="100" font-size="9" fill="#64748b" transform="rotate(-90 14 100)" text-anchor="middle">체력 점수</text>
+
+                    <text x="40" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">0</text>
+                    <text x="170" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">5</text>
+                    <text x="300" y="192" font-size="8" fill="#94a3b8" text-anchor="middle">10</text>
+                    <text x="34" y="183" font-size="8" fill="#94a3b8" text-anchor="end">0</text>
+                    <text x="34" y="103" font-size="8" fill="#94a3b8" text-anchor="end">50</text>
+                    <text x="34" y="24" font-size="8" fill="#94a3b8" text-anchor="end">100</text>
+
+                    <circle cx="40" cy="132" r="4" fill="#94a3b8"/>
+                    <circle cx="69" cy="108" r="4" fill="#94a3b8"/>
+                    <circle cx="98" cy="87" r="4" fill="#94a3b8"/>
+                    <circle cx="127" cy="71" r="4" fill="#94a3b8"/>
+                    <circle cx="156" cy="60" r="4" fill="#94a3b8"/>
+                    <circle cx="184" cy="58" r="4" fill="#94a3b8"/>
+                    <circle cx="213" cy="68" r="4" fill="#94a3b8"/>
+                    <circle cx="242" cy="84" r="4" fill="#94a3b8"/>
+                    <circle cx="271" cy="103" r="4" fill="#94a3b8"/>
+                    <circle cx="300" cy="127" r="4" fill="#94a3b8"/>
+
+                    <path id="poly-line-1" class="poly-curve" d="M40,90 L300,90" stroke="#f43f5e" stroke-width="2.5" fill="none" style="opacity:0;"/>
+                    <path id="poly-line-2" class="poly-curve" d="M40,132 Q170,-20 300,132" stroke="#10b981" stroke-width="2.5" fill="none" style="opacity:1;"/>
+                    <path id="poly-line-9" class="poly-curve" d="M40,132 L55,150 L69,108 L80,130 L98,87 L112,105 L127,71 L142,90 L156,60 L170,75 L184,58 L198,78 L213,68 L228,95 L242,84 L256,110 L271,103 L286,120 L300,127" stroke="#f59e0b" stroke-width="2" fill="none" style="opacity:0;"/>
+                </svg>
+            </div>
+
+            <div id="poly-badge" class="logistic-result-badge" style="margin-top:10px; background:#d1fae5; color:#065f46;">2차 곡선(기본값): 데이터 경향을 매끄럽게 잘 따라가요 → 적절한 적합(Good Fit)</div>
+
+            <div class="sim-controls">
+                <button class="sim-btn" style="background:#f43f5e;" onclick="setPolyDegree(1)">1차 (직선)</button>
+                <button class="sim-btn" style="background:#10b981;" onclick="setPolyDegree(2)">2차 (적절)</button>
+                <button class="sim-btn" style="background:#f59e0b;" onclick="setPolyDegree(9)">9차 (매우 복잡)</button>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h3>✨ 특징 및 장단점</h3>
+            <ul>
+                <li><strong>장점:</strong> 선형 회귀보다 복잡한(비선형적인) 데이터의 패턴을 유연하게 표현할 수 있습니다.</li>
+                <li><strong>단점:</strong> 차수가 너무 높아지면 훈련 데이터에만 지나치게 맞춰지는 과대적합이 발생해 새로운 데이터에 대한 예측력이 오히려 떨어집니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 2; i++) {
+                document.getElementById(`tab-${i}`).classList.remove('active', 'btn-1', 'btn-2');
+                document.getElementById(`panel-${i}`).classList.remove('active');
+            }
+            const activeBtn = document.getElementById(`tab-${tabNum}`);
+            activeBtn.classList.add('active', `btn-${tabNum}`);
+            document.getElementById(`panel-${tabNum}`).classList.add('active');
+        }
+
+        function runLinearRegressionAnim() {
+            const input = document.getElementById('hour-input');
+            let h = parseFloat(input.value);
+            if (isNaN(h) || h < 0) h = 0;
+            if (h > 10) h = 10;
+            input.value = h;
+
+            const predicted = 6.2 * h + 29;
+            const svgX = 40 + h * 26;
+            const svgY = 180 - predicted * 1.6;
+
+            const vline = document.getElementById('reg-vline');
+            const hline = document.getElementById('reg-hline');
+            const marker = document.getElementById('reg-marker');
+            const badge = document.getElementById('linear-badge');
+
+            vline.style.transition = 'none';
+            hline.style.transition = 'none';
+            marker.style.transition = 'none';
+            vline.setAttribute('x1', svgX);
+            vline.setAttribute('x2', svgX);
+            vline.setAttribute('y1', 180);
+            vline.setAttribute('y2', 180);
+            hline.setAttribute('x1', svgX);
+            hline.setAttribute('x2', svgX);
+            hline.setAttribute('y1', svgY);
+            hline.setAttribute('y2', svgY);
+            marker.setAttribute('cx', svgX);
+            marker.setAttribute('cy', 180);
+            marker.setAttribute('r', 0);
+            badge.innerText = '예측 계산 중...';
+            badge.style.background = '#f1f5f9';
+            badge.style.color = '#64748b';
+
+            setTimeout(() => {
+                vline.style.transition = 'y2 0.6s cubic-bezier(0.25,1,0.5,1)';
+                vline.setAttribute('y2', svgY);
+            }, 50);
+
+            setTimeout(() => {
+                hline.style.transition = 'x1 0.6s cubic-bezier(0.25,1,0.5,1)';
+                hline.setAttribute('x1', 40);
+                marker.style.transition = 'cy 0.4s ease, r 0.4s ease';
+                marker.setAttribute('cy', svgY);
+                marker.setAttribute('r', 6);
+            }, 700);
+
+            setTimeout(() => {
+                badge.innerText = `공부 시간 ${h}시간 입력 → 예측 점수: ${predicted.toFixed(1)}점`;
+                badge.style.background = '#e0e7ff';
+                badge.style.color = '#4338ca';
+            }, 1300);
+        }
+
+        function setPolyDegree(deg) {
+            document.querySelectorAll('.poly-curve').forEach(p => p.style.opacity = 0);
+            const badge = document.getElementById('poly-badge');
+
+            if (deg === 1) {
+                document.getElementById('poly-line-1').style.opacity = 1;
+                badge.innerText = '1차 직선: 데이터의 굴곡을 전혀 표현하지 못해요 → 과소적합 (Underfitting)';
+                badge.style.background = '#ffe4e6';
+                badge.style.color = '#be123c';
+            } else if (deg === 2) {
+                document.getElementById('poly-line-2').style.opacity = 1;
+                badge.innerText = '2차 곡선: 데이터 경향을 매끄럽게 잘 따라가요 → 적절한 적합 (Good Fit)';
+                badge.style.background = '#d1fae5';
+                badge.style.color = '#065f46';
+            } else {
+                document.getElementById('poly-line-9').style.opacity = 1;
+                badge.innerText = '9차 곡선: 모든 점을 억지로 통과해요 → 과대적합 (Overfitting)';
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#b45309';
+            }
+        }
+    </script>
+</body>
+</html>
